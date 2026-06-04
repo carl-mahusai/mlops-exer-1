@@ -1,2 +1,3 @@
 **/models/
-**/mlruns
+**/mlruns/
+**/test_dataset/
