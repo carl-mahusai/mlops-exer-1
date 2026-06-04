@@ -1,1 +1,2 @@
 mlflow==3.13.0
+jupyter==1.1.1
