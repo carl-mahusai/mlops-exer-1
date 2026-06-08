@@ -1,3 +1,7 @@
 **/models/
 **/mlruns/
 **/test_dataset/
+
+**/data/downloaded/**
+
+mlflow.db
