@@ -4,4 +4,4 @@
 
 **/data/downloaded/**
 
-../mlflow.db
+mlflow.db
