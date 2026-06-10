@@ -5,3 +5,5 @@
 **/data/downloaded/**
 
 mlflow.db
+**.ckpt
+**.pt
