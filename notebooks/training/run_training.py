@@ -1,6 +1,7 @@
 import argparse
 import torch
 import pandas as pd
+import multiprocessing
 
 from spam_checker.data.spam_lit_datamodule import SMSDataModule
 from spam_checker.models.spam_classifier import SpamClassifier
@@ -44,13 +45,13 @@ def _setup_parser():
         help="Name of the Message Column"
     )
 
-    parser.add_argument(
-        "--num_workers",
-        type=int,
-        default=0,
-        help="Number of workers for the data module"
-        + " Default is 0.",
-    )
+    # parser.add_argument(
+    #     "--num_workers",
+    #     type=int,
+    #     default=0,
+    #     help="Number of workers for the data module"
+    #     + " Default is 0.",
+    # )
 
     parser.add_argument(
         "--batch_size",
@@ -90,6 +91,8 @@ def _setup_parser():
 
 def main():
     print("call main")
+    multiprocessing.set_start_method("spawn", force=True)
+
     parser = _setup_parser()
 
     args = parser.parse_args()
@@ -117,7 +120,9 @@ def main():
 
         # print(df)
 
-        num_workers = args.num_workers
+        # num_workers = args.num_workers
+
+        num_workers = 0
 
         batch_size = args.batch_size
         max_epochs = args.max_epochs

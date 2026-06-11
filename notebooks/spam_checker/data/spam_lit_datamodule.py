@@ -1,5 +1,5 @@
 from collections import Counter
-
+import torch
 import lightning as L
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
@@ -7,7 +7,7 @@ from spam_checker.data.spam_dataset import SMSDataset
 
 
 class SMSDataModule(L.LightningDataModule):
-    def __init__(self, dataframe, batch_size=32, max_vocab_size=10000, max_length=50, num_workers = 0):
+    def __init__(self, dataframe, batch_size=32, max_vocab_size=10000, max_length=50, num_workers = 0, persistent_workers = False):
         super().__init__()
 
         self.df = dataframe.copy()
@@ -18,6 +18,8 @@ class SMSDataModule(L.LightningDataModule):
         self.num_workers = num_workers
 
         self.vocab = None
+
+        self.persistent_workers = persistent_workers
 
         # self.gpus = int(torch.cuda.is_available())
 
@@ -101,21 +103,26 @@ class SMSDataModule(L.LightningDataModule):
             batch_size=self.batch_size,
             shuffle=True,
             num_workers=self.num_workers,
-            # pin_memory=self.on_gpu,
+            pin_memory=False,
+            persistent_workers=self.persistent_workers
         )
 
     def val_dataloader(self):
         return DataLoader(
             self.val_dataset,
             batch_size=self.batch_size,
+            shuffle=False,
             num_workers=self.num_workers,
-            # pin_memory=self.on_gpu
+            pin_memory=False,
+            persistent_workers=self.persistent_workers
         )
 
     def test_dataloader(self):
         return DataLoader(
             self.test_dataset,
             batch_size=self.batch_size,
+            shuffle=False,
             num_workers=self.num_workers,
-            # pin_memory=self.on_gpu
+            pin_memory=False,
+            persistent_workers=self.persistent_workers
         )
