@@ -98,6 +98,7 @@ class SMSDataModule(L.LightningDataModule):
         )
 
     def train_dataloader(self):
+        print("running train dataloader")
         return DataLoader(
             self.train_dataset,
             batch_size=self.batch_size,
@@ -108,6 +109,7 @@ class SMSDataModule(L.LightningDataModule):
         )
 
     def val_dataloader(self):
+        print("running val dataloader")
         return DataLoader(
             self.val_dataset,
             batch_size=self.batch_size,
@@ -118,6 +120,7 @@ class SMSDataModule(L.LightningDataModule):
         )
 
     def test_dataloader(self):
+        print("running test dataloader")
         return DataLoader(
             self.test_dataset,
             batch_size=self.batch_size,
