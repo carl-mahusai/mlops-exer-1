@@ -115,7 +115,7 @@ def main():
 
     if (not df.empty):
 
-        print(df)
+        # print(df)
 
         num_workers = args.num_workers
 
@@ -133,23 +133,30 @@ def main():
 
         data.setup()
 
-        print(len(data.vocab))
+        print("<------------------------data load complete-------------------------------->")
 
         model = SpamClassifier(
             vocab_size=len(data.vocab)
         )
 
+        print("<------------------------model load complete-------------------------------->")
+
         trainer = Trainer(max_epochs=max_epochs, accelerator=accelerator, devices=devices)
+        print("<------------------------trainer build complete-------------------------------->")
 
         trainer.fit(
             model,
             datamodule=data,
         )
 
+        print("<------------------------trainer fit complete-------------------------------->")
+
         trainer.test(
             model,
             datamodule=data,
         )
+
+        print("<------------------------trainer test complete-------------------------------->")
 
         torch.save(data.vocab, "vocab.pt")
         trainer.save_checkpoint("sms_spam.ckpt")
