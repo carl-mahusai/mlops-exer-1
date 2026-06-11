@@ -1,5 +1,6 @@
 **/mlruns/
 **/test_dataset/
+*/lightning_logs/
 
 **/data/downloaded/**
 
