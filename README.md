@@ -34,5 +34,9 @@ Notes regarding the training script
    - --max_epochs. default is 2
 
 
-
+4. Build the docker file for the predictor
+stay on the parent directory and run the following docker build command. 
+```
+docker build -f deployment/Dockerfile -t spam-prediction-service-mlflow:v1 .
+``
 
