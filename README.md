@@ -40,3 +40,7 @@ stay on the parent directory and run the following docker build command.
 docker build -f deployment/Dockerfile -t spam-prediction-service-mlflow:v1 .
 ``
 
+to run the container
+```
+docker run -it --rm -p 9696:9696  spam-prediction-service-mlflow:v1
+```

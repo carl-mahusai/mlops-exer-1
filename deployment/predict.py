@@ -5,12 +5,12 @@ from spam_checker.models.spam_classifier import SpamClassifier
 
 # add section here which would retrieve checkpoint and vocab file to set up model
 
-vocab = torch.load("../vocab.pt")
+# vocab = torch.load("../vocab.pt")
 
-model = SpamClassifier.load_from_checkpoint(
-    "../sms_spam.ckpt",
-    vocab_size=len(vocab),
-)
+# model = SpamClassifier.load_from_checkpoint(
+#     "../sms_spam.ckpt",
+#     vocab_size=len(vocab),
+# )
 
 app = Flask('spam-prediction')
 
