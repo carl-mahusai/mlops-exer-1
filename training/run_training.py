@@ -6,7 +6,7 @@ import multiprocessing
 import mlflow
 from lightning.pytorch.loggers import MLFlowLogger
 from lightning import Trainer
-from lightning.pytorch.callbacks import Callback
+from lightning.pytorch.callbacks import Callback, EarlyStopping
 
 from spam_checker.data.spam_lit_datamodule import SMSDataModule
 from spam_checker.models.spam_classifier import SpamClassifier
@@ -136,6 +136,22 @@ class LogArtifactsCallback(Callback):
                         local_dir=folder_path, 
                         artifact_path="evaluation"
                     )
+
+# Example 1: Stop when validation loss stops decreasing
+early_stop_loss = EarlyStopping(
+    monitor="val_loss",
+    patience=3,
+    mode="min"
+)
+
+# Example 2: Stop when validation accuracy stops increasing
+early_stop_acc = EarlyStopping(
+    monitor="val_acc", 
+    patience=5, 
+    min_delta=0.01, # Minimum change to qualify as an improvement
+    mode="max"
+)
+
 def main():
     print("call main")
     multiprocessing.set_start_method("spawn", force=True)
@@ -148,7 +164,9 @@ def main():
 
     mlflow_logger = None
 
-    callbacks = []
+    print(early_stop_acc)
+
+    callbacks = [early_stop_acc]
 
     if args.mlflow_tracking_uri:
         if (len(args.mlflow_tracking_uri)):
@@ -160,9 +178,9 @@ def main():
                 tracking_uri=args.mlflow_tracking_uri,  # Point to your local or remote server
                 log_model='all'
             )
-            callbacks = [LogArtifactsCallback()]
+            callbacks.append(LogArtifactsCallback())
 
-
+    print(callbacks)
     if args.data:
         df = convert_to_df(args.data)
         label_column = ''
