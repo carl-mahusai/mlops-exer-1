@@ -15,7 +15,7 @@ this will install the dev requirements
 mlflow server --port 5001 --backend-store-uri sqlite:///mlflow.db --default-artifact-root ./mlruns
 ```
 
-this will create an sqlite file named mlflow.db for the backend store where runs and artifacts are stored and a folder named mlruns which will contain
+this will create an sqlite file named mlflow.db for the backend store where runs and artifacts are stored and a folder named mlruns which will contain your experiment runs
 
 you can view mlflow in
 ```
@@ -37,7 +37,7 @@ Notes regarding the training script
 2. The optional commands are
    - --batch_size. default is 64
    - --max_epochs. default is 2
-3. --mlflow_tracking_uri is optional. if it's ommited the vocab file and checkpoint file are saved at the root. with mlflow server running, this will upload the vocab file and checkpoint file to your local mlflow
+3. --mlflow_tracking_uri is optional. if it's ommited the vocab file and checkpoint file are saved at the root. with mlflow server running and --mlflow_tracking_uri included in the arguments, this will upload the vocab file and checkpoint file to your local mlflow
 
 
 4. Build the docker file for the predictor
