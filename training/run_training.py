@@ -166,7 +166,9 @@ def main():
 
     print(early_stop_acc)
 
-    callbacks = [early_stop_acc]
+    # callbacks = [early_stop_acc]
+
+    callbacks = [early_stop_loss]
 
     if args.mlflow_tracking_uri:
         if (len(args.mlflow_tracking_uri)):
@@ -227,6 +229,22 @@ def main():
         )
 
         print("<------------------------model load complete-------------------------------->")
+
+        gpus = int(torch.cuda.is_available())
+
+        # if(gpus > 0):
+        #     accelerator = "gpu"
+
+        # trainer = Trainer(
+        #     max_epochs=max_epochs,
+        #     accelerator=accelerator,
+        #     devices=devices, 
+        #     logger=mlflow_logger,
+        #     callbacks=callbacks,
+        #     strategy="ddp",           # Uses Distributed Data Parallel
+        #     num_nodes=1,              # Set >1 for multi-machine setups
+        #     # use_distributed_sampler=False
+        # )
 
         trainer = Trainer(
             max_epochs=max_epochs,
