@@ -7,7 +7,7 @@ from spam_checker.data.spam_dataset import SMSDataset
 
 
 class SMSDataModule(L.LightningDataModule):
-    def __init__(self, dataframe, batch_size=32, max_vocab_size=10000, max_length=50, num_workers = 0, persistent_workers = False):
+    def __init__(self, dataframe, batch_size=32, max_vocab_size=10000, max_length=50, num_workers = 0, persistent_workers = False, vocab = None):
         super().__init__()
 
         self.df = dataframe.copy()
@@ -17,7 +17,7 @@ class SMSDataModule(L.LightningDataModule):
         self.max_length = max_length
         self.num_workers = num_workers
 
-        self.vocab = None
+        self.vocab = vocab
 
         self.persistent_workers = persistent_workers
 
@@ -72,9 +72,10 @@ class SMSDataModule(L.LightningDataModule):
             random_state=42,
         )
 
-        self.vocab = self.build_vocab(
-            train_df["message"]
-        )
+        if (not self.vocab):
+            self.vocab = self.build_vocab(
+                train_df["message"]
+            )
 
         self.train_dataset = SMSDataset(
             train_df["message"].tolist(),

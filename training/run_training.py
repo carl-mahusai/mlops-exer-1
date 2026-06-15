@@ -1,3 +1,4 @@
+import os
 import argparse
 import torch
 import pandas as pd
@@ -5,6 +6,7 @@ import multiprocessing
 import mlflow
 from lightning.pytorch.loggers import MLFlowLogger
 from lightning import Trainer
+from lightning.pytorch.callbacks import Callback
 
 from spam_checker.data.spam_lit_datamodule import SMSDataModule
 from spam_checker.models.spam_classifier import SpamClassifier
@@ -99,6 +101,31 @@ def _setup_parser():
 
     return parser
 
+class LogArtifactsCallback(Callback):
+    def on_train_end(self, trainer, pl_module):
+        # Ensure the logger is an MLFlowLogger
+        if isinstance(trainer.logger, MLFlowLogger):
+            # Access the underlying mlflow client and current run ID
+            mlflow_client = trainer.logger.experiment
+            run_id = trainer.logger.run_id
+            
+            # Define your local file paths
+            local_file = "outputs/confusion_matrix.png"
+            local_dir = "outputs/plots/"
+            
+            # Log individual file as an artifact
+            if os.path.exists(local_file):
+                mlflow_client.log_artifact(run_id, local_file, artifact_path="evaluation")
+                
+            # Log an entire directory of files
+            if os.path.isdir(local_dir):
+                mlflow_client.log_artifacts(run_id, local_dir, artifact_path="plots")
+
+# trainer = Trainer(
+#     logger=mlflow_logger,
+#     callbacks=[LogArtifactsCallback()]
+# )
+
 def main():
     print("call main")
     multiprocessing.set_start_method("spawn", force=True)
@@ -110,9 +137,12 @@ def main():
     df = pd.DataFrame()
 
     mlflow_logger = None
+    callbacks = []
+    mlflow_tracking_uri = ""
 
     if args.mlflow_tracking_uri:
         if (len(args.mlflow_tracking_uri)):
+            mlflow.pytorch.autolog()
             mlflow.set_tracking_uri(args.mlflow_tracking_uri)
 
             mlflow_logger = MLFlowLogger(
@@ -167,7 +197,13 @@ def main():
 
         print("<------------------------model load complete-------------------------------->")
 
-        trainer = Trainer(max_epochs=max_epochs, accelerator=accelerator, devices=devices, logger=mlflow_logger)
+        trainer = Trainer(
+            max_epochs=max_epochs,
+            accelerator=accelerator,
+            devices=devices, 
+            logger=mlflow_logger,
+            callbacks=callbacks
+        )
         print("<------------------------trainer build complete-------------------------------->")
 
         trainer.fit(
@@ -184,8 +220,15 @@ def main():
 
         print("<------------------------trainer test complete-------------------------------->")
 
-        torch.save(data.vocab, "vocab.pt")
-        trainer.save_checkpoint("sms_spam.ckpt")
+        # if (mlflow_logger):
+        #     run_id = mlflow_logger.run_id
+
+        #     print(run_id)
+
+        #     torch.save(data.vocab, "vocab.pt")
+        #     trainer.save_checkpoint("sms_spam.ckpt")
+
+
 
 
 
