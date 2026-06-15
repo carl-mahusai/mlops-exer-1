@@ -20,30 +20,6 @@ class SMSDataset(Dataset):
         
         print("calling smsdataset")
 
-    # def build_vocab(self):
-    #     # 2. Text Preprocessing and Vocabulary Builder
-    #     def clean_text(text):
-    #         text = text.lower()
-    #         text = re.sub(r'[^a-z0-9\s]', '', text)
-    #         return text.split()
-
-    #     # Build Vocabulary
-    #     all_words = []
-    #     for text in self.texts:
-    #         all_words.extend(clean_text(text))
-
-    #     word_counts = Counter(all_words)
-    #     # Filter words that appear at least once; add <PAD> and <UNK> tokens
-    #     vocab = {"<PAD>": 0, "<UNK>": 1}
-    #     for word in word_counts:
-    #         if word not in vocab:
-    #             vocab[word] = len(vocab)
-
-    #     # VOCAB_SIZE = len(vocab)
-    #     # MAX_LEN = 20  # Max sequence length for padding
-
-    #     print(vocab)
-    #     return vocab
     def build_vocab(self, texts):
         counter = Counter()
 

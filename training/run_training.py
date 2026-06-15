@@ -7,6 +7,7 @@ import mlflow
 from lightning.pytorch.loggers import MLFlowLogger
 from lightning import Trainer
 from lightning.pytorch.callbacks import Callback, EarlyStopping
+from lightning.pytorch.utilities.rank_zero import rank_zero_only
 
 from spam_checker.data.spam_lit_datamodule import SMSDataModule
 from spam_checker.models.spam_classifier import SpamClassifier
@@ -95,11 +96,38 @@ def _setup_parser():
         help="Tracking uri to be used by mlflow"
     )
 
+    parser.add_argument(
+        "--distributed_processing",
+        action="store_true",
+        default=False,
+        help=(
+            "Will run distributed processing if used."
+            "Note that it looks like there's an issue with distributed processing if mlflow is used with an sqlite db so training may crash as a result."
+            "Use this only if mlflow is running a proper database."
+        ),
+    )
+
 
     # to call
     # df = args.data  # This is now a fully loaded pandas DataFrame object!
 
     return parser
+
+@rank_zero_only
+def log_artifacts_manual(mlflow_client, run_id, folder_path, trainer):
+    data = trainer.datamodule
+    vocab_pt_file_path = folder_path + "vocab.pt"
+    sms_spam_checkpoint_file_path = folder_path + "sms_spam.ckpt"
+
+    torch.save(data.vocab, vocab_pt_file_path)
+    trainer.save_checkpoint(sms_spam_checkpoint_file_path)
+
+
+    mlflow_client.log_artifacts(
+        run_id=run_id, 
+        local_dir=folder_path, 
+        artifact_path="evaluation"
+    )
 
 class LogArtifactsCallback(Callback):
     def on_train_end(self, trainer, pl_module):
@@ -121,21 +149,29 @@ class LogArtifactsCallback(Callback):
 
                 if os.path.isdir(folder_path):
 
-                    vocab_pt_file_path = folder_path + "vocab.pt"
-                    sms_spam_checkpoint_file_path = folder_path + "sms_spam.ckpt"
+                    # vocab_pt_file_path = folder_path + "vocab.pt"
+                    # sms_spam_checkpoint_file_path = folder_path + "sms_spam.ckpt"
 
-                    torch.save(data.vocab, vocab_pt_file_path)
-                    trainer.save_checkpoint(sms_spam_checkpoint_file_path)
+                    # torch.save(data.vocab, vocab_pt_file_path)
+                    # trainer.save_checkpoint(sms_spam_checkpoint_file_path)
 
                     # print(data.vocab)
 
                     print("calling on save artifacts")
 
-                    mlflow_client.log_artifacts(
-                        run_id=run_id, 
-                        local_dir=folder_path, 
-                        artifact_path="evaluation"
+                    # mlflow_client.log_artifacts(
+                    #     run_id=run_id, 
+                    #     local_dir=folder_path, 
+                    #     artifact_path="evaluation"
+                    # )
+                    log_artifacts_manual(
+                        mlflow_client=mlflow_client,
+                        run_id=run_id,
+                        folder_path=folder_path,
+                        trainer=trainer
                     )
+
+                    
 
 # Example 1: Stop when validation loss stops decreasing
 early_stop_loss = EarlyStopping(
@@ -232,27 +268,31 @@ def main():
 
         gpus = int(torch.cuda.is_available())
 
-        # if(gpus > 0):
-        #     accelerator = "gpu"
+        if (args.distributed_processing):
 
-        # trainer = Trainer(
-        #     max_epochs=max_epochs,
-        #     accelerator=accelerator,
-        #     devices=devices, 
-        #     logger=mlflow_logger,
-        #     callbacks=callbacks,
-        #     strategy="ddp",           # Uses Distributed Data Parallel
-        #     num_nodes=1,              # Set >1 for multi-machine setups
-        #     # use_distributed_sampler=False
-        # )
+            print("calling distributed processing")
+            if(gpus > 0 and accelerator == "auto"):
+                accelerator = "gpu"
 
-        trainer = Trainer(
-            max_epochs=max_epochs,
-            accelerator=accelerator,
-            devices=devices, 
-            logger=mlflow_logger,
-            callbacks=callbacks
-        )
+            trainer = Trainer(
+                max_epochs=max_epochs,
+                accelerator=accelerator,
+                devices=devices, 
+                logger=mlflow_logger,
+                callbacks=callbacks,
+                strategy="ddp",           # Uses Distributed Data Parallel
+                num_nodes=1,              # Set >1 for multi-machine setups
+                # use_distributed_sampler=False
+            )
+        else:
+            print("calling single processing")
+            trainer = Trainer(
+                max_epochs=max_epochs,
+                accelerator=accelerator,
+                devices=devices, 
+                logger=mlflow_logger,
+                callbacks=callbacks
+            )
         print("<------------------------trainer build complete-------------------------------->")
 
         trainer.fit(
