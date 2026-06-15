@@ -108,18 +108,35 @@ class LogArtifactsCallback(Callback):
             # Access the underlying mlflow client and current run ID
             mlflow_client = trainer.logger.experiment
             run_id = trainer.logger.run_id
-            
-            # Define your local file paths
-            local_file = "outputs/confusion_matrix.png"
-            local_dir = "outputs/plots/"
-            
-            # Log individual file as an artifact
-            if os.path.exists(local_file):
-                mlflow_client.log_artifact(run_id, local_file, artifact_path="evaluation")
-                
-            # Log an entire directory of files
-            if os.path.isdir(local_dir):
-                mlflow_client.log_artifacts(run_id, local_dir, artifact_path="plots")
+
+            data = trainer.datamodule
+
+            folder_path = "./training_run/" + run_id + "/" 
+
+            if not os.path.isdir(folder_path):
+                os.makedirs(folder_path)
+
+                if os.path.isdir(folder_path):
+
+                    vocab_pt_file_path = folder_path + "vocab.pt"
+                    sms_spam_checkpoint_file_path = folder_path + "sms_spam.ckpt"
+
+                    torch.save(data.vocab, vocab_pt_file_path)
+                    trainer.save_checkpoint(sms_spam_checkpoint_file_path)
+
+                    # print(data.vocab)
+                    
+                    # # Define your local file paths
+                    # local_file = "outputs/confusion_matrix.png"
+                    # local_dir = "outputs/plots/"
+                    
+                    # # Log individual file as an artifact
+                    if os.path.exists(vocab_pt_file_path):
+                        mlflow_client.log_artifact(run_id, vocab_pt_file_path, artifact_path="vocab")
+                        
+                    # Log an entire directory of files
+                    if os.path.isdir(sms_spam_checkpoint_file_path):
+                        mlflow_client.log_artifacts(run_id, sms_spam_checkpoint_file_path, artifact_path="checkpoint")
 
 # trainer = Trainer(
 #     logger=mlflow_logger,
@@ -138,7 +155,6 @@ def main():
 
     mlflow_logger = None
     callbacks = []
-    mlflow_tracking_uri = ""
 
     if args.mlflow_tracking_uri:
         if (len(args.mlflow_tracking_uri)):
@@ -147,8 +163,11 @@ def main():
 
             mlflow_logger = MLFlowLogger(
                 experiment_name="spam_training",
-                tracking_uri=args.mlflow_tracking_uri  # Point to your local or remote server
+                tracking_uri=args.mlflow_tracking_uri,  # Point to your local or remote server
+                log_model='all'
             )
+
+            callbacks = [LogArtifactsCallback()]
 
     if args.data:
         df = convert_to_df(args.data)
