@@ -2,6 +2,7 @@ import argparse
 import torch
 import pandas as pd
 import multiprocessing
+import mlflow
 
 from spam_checker.data.spam_lit_datamodule import SMSDataModule
 from spam_checker.models.spam_classifier import SpamClassifier
@@ -83,6 +84,13 @@ def _setup_parser():
         help="Devices for the trainer"
     )
 
+    parser.add_argument(
+        "--mlflow_tracking_uri", 
+        type=str,  # Passes the string path through your function
+        default="",
+        help="Tracking uri to be used by mlflow"
+    )
+
 
     # to call
     # df = args.data  # This is now a fully loaded pandas DataFrame object!
@@ -98,6 +106,10 @@ def main():
     args = parser.parse_args()
 
     df = pd.DataFrame()
+
+    if args.mlflow_tracking_uri:
+        if (len(args.mlflow_tracking_uri)):
+            mlflow.set_tracking_uri(args.mlflow_tracking_uri)
 
     if args.data:
         df = convert_to_df(args.data)
