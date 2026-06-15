@@ -130,36 +130,12 @@ class LogArtifactsCallback(Callback):
                     # print(data.vocab)
 
                     print("calling on save artifacts")
-                    
-                    # # Define your local file paths
-                    # local_file = "outputs/confusion_matrix.png"
-                    # local_dir = "outputs/plots/"
-                    
-                    # # Log individual file as an artifact
-                    # try:
-                    #     if os.path.exists(vocab_pt_file_path):
-                    #         mlflow_client.log_artifact(run_id, vocab_pt_file_path, artifact_path="vocab")
-                    # except Exception as e:
-                    #     print(f"Exception occured when saving vocab {e}") 
-                        
-                    # # Log an entire directory of files
-                    # try:
-                    #     if os.path.isdir(sms_spam_checkpoint_file_path):
-                    #         mlflow_client.log_artifact(run_id, sms_spam_checkpoint_file_path, artifact_path="checkpoint")
-                    # except Exception as e:
-                    #     print(f"Exception occured when saving checkpoint {e}") 
 
                     mlflow_client.log_artifacts(
                         run_id=run_id, 
                         local_dir=folder_path, 
                         artifact_path="evaluation"
                     )
-
-# trainer = Trainer(
-#     logger=mlflow_logger,
-#     callbacks=[LogArtifactsCallback()]
-# )
-
 def main():
     print("call main")
     multiprocessing.set_start_method("spawn", force=True)
@@ -171,6 +147,7 @@ def main():
     df = pd.DataFrame()
 
     mlflow_logger = None
+
     callbacks = []
 
     if args.mlflow_tracking_uri:
@@ -183,8 +160,8 @@ def main():
                 tracking_uri=args.mlflow_tracking_uri,  # Point to your local or remote server
                 # log_model='all'
             )
-
             callbacks = [LogArtifactsCallback()]
+
 
     if args.data:
         df = convert_to_df(args.data)
@@ -256,13 +233,9 @@ def main():
 
         print("<------------------------trainer test complete-------------------------------->")
 
-        # if (mlflow_logger):
-        #     run_id = mlflow_logger.run_id
-
-        #     print(run_id)
-
-        #     torch.save(data.vocab, "vocab.pt")
-        #     trainer.save_checkpoint("sms_spam.ckpt")
+        if (len(callbacks) <= 0):
+            torch.save(data.vocab, "vocab.pt")
+            trainer.save_checkpoint("sms_spam.ckpt")
 
 
 
