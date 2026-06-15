@@ -18,11 +18,12 @@ app = Flask('spam-prediction')
 def predict_endpoint():
     text = request.get_json()
 
-    print("text")
+    print(text)
 
-    # return jsonify({
-    #     'result': "test"
-    # })
+    return jsonify({
+        "prediction": "ham",
+        "spam_probability": "0.1",
+    })
 
 
 if __name__ == "__main__":
