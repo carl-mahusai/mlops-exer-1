@@ -7,6 +7,10 @@ WORKDIR /app
 COPY [ "requirements/requirements-dev.txt", "./" ]
 RUN pip install --no-cache-dir -r requirements-dev.txt
 
+# comment out copying of checkpoint and vocab when pulling info from mlflow
+COPY [ "sms_spam.ckpt", "./" ]
+COPY [ "vocab.pt", "./" ]
+
 COPY [ "deployment/predict.py", "./" ]
 
 COPY [ "spam_checker", "./spam_checker" ]

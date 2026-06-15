@@ -27,6 +27,11 @@ http://127.0.0.1:5001
 python -m training.run_training --data=<path to input data> --name_of_label_column=<column where the labels are> --name_of_message_column=<name of column where the messages are>
 ```
 
+for example
+```
+python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_column='v1' --name_of_message_column='v2'
+```
+
 Notes regarding the training script
 1. The label column should contain "ham" for non-spam messages and "spam" for spam messages. you may add other columns but those would be ignored
 2. The optional commands are
