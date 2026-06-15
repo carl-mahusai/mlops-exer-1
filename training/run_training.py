@@ -3,10 +3,12 @@ import torch
 import pandas as pd
 import multiprocessing
 import mlflow
+from lightning.pytorch.loggers import MLFlowLogger
+from lightning import Trainer
 
 from spam_checker.data.spam_lit_datamodule import SMSDataModule
 from spam_checker.models.spam_classifier import SpamClassifier
-from lightning import Trainer
+
 
 def convert_to_df(file_path):
     try:
@@ -107,9 +109,16 @@ def main():
 
     df = pd.DataFrame()
 
+    mlflow_logger = None
+
     if args.mlflow_tracking_uri:
         if (len(args.mlflow_tracking_uri)):
             mlflow.set_tracking_uri(args.mlflow_tracking_uri)
+
+            mlflow_logger = MLFlowLogger(
+                experiment_name="spam_training",
+                tracking_uri=args.mlflow_tracking_uri  # Point to your local or remote server
+            )
 
     if args.data:
         df = convert_to_df(args.data)
@@ -158,7 +167,7 @@ def main():
 
         print("<------------------------model load complete-------------------------------->")
 
-        trainer = Trainer(max_epochs=max_epochs, accelerator=accelerator, devices=devices)
+        trainer = Trainer(max_epochs=max_epochs, accelerator=accelerator, devices=devices, logger=mlflow_logger)
         print("<------------------------trainer build complete-------------------------------->")
 
         trainer.fit(
