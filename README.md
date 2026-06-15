@@ -22,14 +22,14 @@ you can view mlflow in
 http://127.0.0.1:5001
 ```
 
-3. Run the following from your CLI to initiate training
+3. Make sure you're at the root of the repo then run the following from your CLI to initiate training
 ```
-python -m training.run_training --data=<path to input data> --name_of_label_column=<column where the labels are> --name_of_message_column=<name of column where the messages are>
+python -m training.run_training --data=<path to input data> --name_of_label_column=<column where the labels are> --name_of_message_column=<name of column where the messages are> --mlflow_tracking_uri='sqlite:///mlflow.db'
 ```
 
 for example
 ```
-python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_column='v1' --name_of_message_column='v2'
+python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_column='v1' --name_of_message_column='v2' --mlflow_tracking_uri='sqlite:///mlflow.db'
 ```
 
 Notes regarding the training script
@@ -37,6 +37,7 @@ Notes regarding the training script
 2. The optional commands are
    - --batch_size. default is 64
    - --max_epochs. default is 2
+3. --mlflow_tracking_uri is optional. if it's ommited the vocab file and checkpoint file are saved at the root. with mlflow server running, this will upload the vocab file and checkpoint file to your local mlflow
 
 
 4. Build the docker file for the predictor
