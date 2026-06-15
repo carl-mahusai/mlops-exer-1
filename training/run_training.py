@@ -104,6 +104,9 @@ def _setup_parser():
 class LogArtifactsCallback(Callback):
     def on_train_end(self, trainer, pl_module):
         # Ensure the logger is an MLFlowLogger
+
+        print("calling on train end")
+
         if isinstance(trainer.logger, MLFlowLogger):
             # Access the underlying mlflow client and current run ID
             mlflow_client = trainer.logger.experiment
@@ -125,18 +128,32 @@ class LogArtifactsCallback(Callback):
                     trainer.save_checkpoint(sms_spam_checkpoint_file_path)
 
                     # print(data.vocab)
+
+                    print("calling on save artifacts")
                     
                     # # Define your local file paths
                     # local_file = "outputs/confusion_matrix.png"
                     # local_dir = "outputs/plots/"
                     
                     # # Log individual file as an artifact
-                    if os.path.exists(vocab_pt_file_path):
-                        mlflow_client.log_artifact(run_id, vocab_pt_file_path, artifact_path="vocab")
+                    # try:
+                    #     if os.path.exists(vocab_pt_file_path):
+                    #         mlflow_client.log_artifact(run_id, vocab_pt_file_path, artifact_path="vocab")
+                    # except Exception as e:
+                    #     print(f"Exception occured when saving vocab {e}") 
                         
-                    # Log an entire directory of files
-                    if os.path.isdir(sms_spam_checkpoint_file_path):
-                        mlflow_client.log_artifacts(run_id, sms_spam_checkpoint_file_path, artifact_path="checkpoint")
+                    # # Log an entire directory of files
+                    # try:
+                    #     if os.path.isdir(sms_spam_checkpoint_file_path):
+                    #         mlflow_client.log_artifact(run_id, sms_spam_checkpoint_file_path, artifact_path="checkpoint")
+                    # except Exception as e:
+                    #     print(f"Exception occured when saving checkpoint {e}") 
+
+                    mlflow_client.log_artifacts(
+                        run_id=run_id, 
+                        local_dir=folder_path, 
+                        artifact_path="evaluation"
+                    )
 
 # trainer = Trainer(
 #     logger=mlflow_logger,
@@ -164,7 +181,7 @@ def main():
             mlflow_logger = MLFlowLogger(
                 experiment_name="spam_training",
                 tracking_uri=args.mlflow_tracking_uri,  # Point to your local or remote server
-                log_model='all'
+                # log_model='all'
             )
 
             callbacks = [LogArtifactsCallback()]
