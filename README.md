@@ -74,3 +74,8 @@ curl http://host.docker.internal:5001
 ```
 
 check your local mlflow server. it should return a 200 response
+
+to test the docker container, from the root folder, run this in your CLI
+```
+python deployment/test.py
+```

@@ -35,6 +35,9 @@ TRACKING_URI = os.getenv('TRACKING_URI')
 
 print(TRACKING_URI)
 
+artifact_path = "evaluation"  # Downloads everything in the run root directory
+local_dir = "./artifact_download"
+
 if (len(RUN_ID) > 0 and len(TRACKING_URI) > 0):
     # client = MlflowClient()
     # local_path = client.download_artifacts(run_id=RUN_ID, path="train.csv", dst_path=".")
@@ -50,9 +53,6 @@ if (len(RUN_ID) > 0 and len(TRACKING_URI) > 0):
     print(run_info.info.artifact_uri)
 
 
-
-    artifact_path = "evaluation"  # Downloads everything in the run root directory
-    local_dir = "./artifact_download"
 
     # Download using the specified client instance
     mlflow.artifacts.download_artifacts(
@@ -71,15 +71,15 @@ if (len(RUN_ID) > 0 and len(TRACKING_URI) > 0):
     # for file_path in artifacts_list:
     #     print(f" - {file_path}")
 
+vocab_path = local_dir + "/" + artifact_path + "/" + "vocab.pt"
+model_path = local_dir + "/" + artifact_path + "/" + "sms_spam.ckpt"
 
-# vocab = torch.load("vocab.pt")
+vocab = torch.load(vocab_path)
 
-# model = SpamClassifier.load_from_checkpoint(
-#     "sms_spam.ckpt",
-#     vocab_size=len(vocab),
-# )
-
-
+model = SpamClassifier.load_from_checkpoint(
+    model_path,
+    vocab_size=len(vocab),
+)
 
 app = Flask('spam-prediction')
 
@@ -87,15 +87,15 @@ app = Flask('spam-prediction')
 def predict_endpoint():
     text = request.get_json()
 
-    # result = predict_sms(
-    #     text,
-    #     model,
-    #     vocab,
-    # )
+    result = predict_sms(
+        text,
+        model,
+        vocab,
+    )
 
-    result = {
-        "text": "test"
-    }
+    # result = {
+    #     "text": "test"
+    # }
 
     # print(result)
 
