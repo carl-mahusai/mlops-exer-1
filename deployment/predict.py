@@ -40,6 +40,7 @@ script_dir = Path(__file__).resolve().parent
 artifact_path = "evaluation"  # Downloads everything in the run root directory
 local_dir = script_dir / "artifact_download"
 
+error_message = "model files don't exist"
 if (len(RUN_ID) > 0 and len(TRACKING_URI) > 0):
     # client = MlflowClient()
     # local_path = client.download_artifacts(run_id=RUN_ID, path="train.csv", dst_path=".")
@@ -78,17 +79,19 @@ if (len(RUN_ID) > 0 and len(TRACKING_URI) > 0):
     model_path = local_dir / artifact_path / "sms_spam.ckpt"
 
     model_built = False
-
     if (vocab_path.exists() and model_path.exists()):
+        try:
+            vocab = torch.load(vocab_path)
 
-        vocab = torch.load(vocab_path)
+            model = SpamClassifier.load_from_checkpoint(
+                model_path,
+                vocab_size=len(vocab),
+            )
 
-        model = SpamClassifier.load_from_checkpoint(
-            model_path,
-            vocab_size=len(vocab),
-        )
-
-        model_built = True
+            model_built = True
+        except Exception as e:
+            model_built = False
+            error_message = str(e)
 
 app = Flask('spam-prediction')
 
@@ -106,7 +109,8 @@ def predict_endpoint():
         result["response"] = "ok"
     else:
         result = {
-            "response": "nok"
+            "response": "nok",
+            "error_message": error_message
         }
 
     # print(result)
