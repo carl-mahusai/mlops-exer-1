@@ -45,7 +45,7 @@ Notes regarding the training script
    - --batch_size. default is 64
    - --max_epochs. default is 2
 3. --mlflow_tracking_uri is optional. if it's ommited the vocab file and checkpoint file are saved at the root. with mlflow server running and --mlflow_tracking_uri included in the arguments, this will upload the vocab file and checkpoint file to your local mlflow
-4. During testing, when i was using distributed processing with mlflow tracking using sqlite, the part which saves artifacts to mlflow kept crashing even if i had everything setup so that only rank 0 will handle saving. it does sometimes work but just in case you're having issues with training using mlflow with sqlite, don't include this argument. Note that when turned on, it will use the gpu for training.
+4. During testing, when i was using distributed processing with mlflow tracking using sqlite, the part which saves artifacts to mlflow kept crashing even if i had everything setup so that only rank 0 will handle saving. it does sometimes work but just in case you're having issues with training using mlflow with sqlite, don't include this argument. You can run distributed training consistently if you remove ```--mlflow_tracking_uri``` while ```--distributed_processing``` is on. Note that when turned on, it will use the gpu for training.
 
 
 4. Build the docker file for the predictor
