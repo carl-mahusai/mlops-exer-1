@@ -3,6 +3,7 @@ import torch
 import os
 from mlflow.tracking import MlflowClient
 import mlflow.artifacts
+from pathlib import Path
 
 from spam_checker.models.spam_classifier import SpamClassifier
 from spam_checker.predict_sms import predict_sms
@@ -35,8 +36,9 @@ TRACKING_URI = os.getenv('TRACKING_URI')
 
 print(TRACKING_URI)
 
+script_dir = Path(__file__).resolve().parent
 artifact_path = "evaluation"  # Downloads everything in the run root directory
-local_dir = "./artifact_download"
+local_dir = script_dir / "artifact_download"
 
 if (len(RUN_ID) > 0 and len(TRACKING_URI) > 0):
     # client = MlflowClient()
@@ -71,15 +73,16 @@ if (len(RUN_ID) > 0 and len(TRACKING_URI) > 0):
     # for file_path in artifacts_list:
     #     print(f" - {file_path}")
 
-vocab_path = local_dir + "/" + artifact_path + "/" + "vocab.pt"
-model_path = local_dir + "/" + artifact_path + "/" + "sms_spam.ckpt"
 
-vocab = torch.load(vocab_path)
+    vocab_path = local_dir / artifact_path / "vocab.pt"
+    model_path = local_dir / artifact_path / "sms_spam.ckpt"
 
-model = SpamClassifier.load_from_checkpoint(
-    model_path,
-    vocab_size=len(vocab),
-)
+    vocab = torch.load(vocab_path)
+
+    model = SpamClassifier.load_from_checkpoint(
+        model_path,
+        vocab_size=len(vocab),
+    )
 
 app = Flask('spam-prediction')
 
