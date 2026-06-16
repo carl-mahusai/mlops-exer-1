@@ -63,3 +63,10 @@ for a local run, add ```--add-host=host.docker.internal:host-gateway``` and use 
 ```
 docker run -it --rm -p 9696:9696 -e RUN_ID=fe62180c6adc43ce9ebe761edff4446b -e TRACKING_URI="http://host.docker.internal:5001" --add-host=host.docker.internal:host-gateway spam-prediction-service-mlflow:v1
 ```
+
+to test that the container can connect to your mlflow setup, run the following in the container
+```
+curl http://host.docker.internal:5001
+```
+
+check your local mlflow server. it should return a 200 response

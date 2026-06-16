@@ -17,23 +17,23 @@ TRACKING_URI = os.getenv('TRACKING_URI')
 
 print(TRACKING_URI)
 
-if (len(RUN_ID) > 0 and len(TRACKING_URI) > 0):
-    # client = MlflowClient()
-    # local_path = client.download_artifacts(run_id=RUN_ID, path="train.csv", dst_path=".")
-    mlflow.set_tracking_uri(TRACKING_URI)
-    client = MlflowClient()
+# if (len(RUN_ID) > 0 and len(TRACKING_URI) > 0):
+#     # client = MlflowClient()
+#     # local_path = client.download_artifacts(run_id=RUN_ID, path="train.csv", dst_path=".")
+#     mlflow.set_tracking_uri(TRACKING_URI)
+#     client = MlflowClient()
 
-    # run_id = "YOUR_RUN_ID_HERE"
-    artifact_path = "evaluation"  # Downloads everything in the run root directory
-    local_dir = ""
+#     # run_id = "YOUR_RUN_ID_HERE"
+#     artifact_path = "evaluation"  # Downloads everything in the run root directory
+#     local_dir = ""
 
-    # Download using the specified client instance
-    mlflow.artifacts.download_artifacts(
-        run_id=RUN_ID,
-        artifact_path=artifact_path,
-        dst_path=local_dir,
-        tracking_uri=client.tracking_uri
-    )
+#     # Download using the specified client instance
+#     mlflow.artifacts.download_artifacts(
+#         run_id=RUN_ID,
+#         artifact_path=artifact_path,
+#         dst_path=local_dir,
+#         tracking_uri=client.tracking_uri
+#     )
 
 
 # vocab = torch.load("vocab.pt")
