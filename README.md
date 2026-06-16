@@ -56,7 +56,7 @@ Notes regarding the training script
 stay on the parent directory and run the following docker build command. 
 ```
 docker build -f deployment/Dockerfile -t spam-prediction-service-mlflow:v1 .
-``
+```
 
 to run the container locally
 ```
@@ -65,7 +65,7 @@ docker run -it --rm -p 9696:9696 -e RUN_ID=<run id in mlflow> -e TRACKING_URI=<t
 
 for a local run, add ```--add-host=host.docker.internal:host-gateway``` and use "http://host.docker.internal:5001" for the tracking uri. this will connect to the mlflow setup running 
 ```
-docker run -it --rm -p 9696:9696 -e RUN_ID=a5ac8af72e684ac0850b32e3ccaf317e -e TRACKING_URI="http://host.docker.internal:5001" --add-host=host.docker.internal:host-gateway spam-prediction-service-mlflow:v1
+docker run -it --rm -p 9696:9696 -e RUN_ID=73b284d54f1d46d0a0ac09b058dc33a4 -e TRACKING_URI="http://host.docker.internal:5001" --add-host=host.docker.internal:host-gateway spam-prediction-service-mlflow:v1
 ```
 
 to test that the container can connect to your mlflow setup, run the following in the container

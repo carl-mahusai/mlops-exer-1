@@ -50,23 +50,17 @@ if (len(RUN_ID) > 0 and len(TRACKING_URI) > 0):
     print(run_info.info.artifact_uri)
 
 
-    # artifacts = client.list_artifacts(RUN_ID)
 
-    # # 4. Filter and display only folders
-    # print(artifacts)
+    artifact_path = "evaluation"  # Downloads everything in the run root directory
+    local_dir = "./artifact_download"
 
-    # run_id = "YOUR_RUN_ID_HERE"
-    # artifact_path = "evaluation"  # Downloads everything in the run root directory
-    # artifact_path = ""  # Downloads everything in the run root directory
-    # local_dir = ""
-
-    # # Download using the specified client instance
-    # mlflow.artifacts.download_artifacts(
-    #     run_id=RUN_ID,
-    #     artifact_path=artifact_path,
-    #     dst_path=local_dir,
-    #     tracking_uri=client.tracking_uri
-    # )
+    # Download using the specified client instance
+    mlflow.artifacts.download_artifacts(
+        run_id=RUN_ID,
+        artifact_path=artifact_path,
+        dst_path=local_dir,
+        tracking_uri=client.tracking_uri
+    )
 
     # artifacts_list = list_all_artifacts_recursive(
     #     client=client,
