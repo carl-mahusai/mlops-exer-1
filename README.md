@@ -12,7 +12,7 @@ this will install the dev requirements
 
 2. start mlflow at the root folder like so
 ```
-mlflow server --host 0.0.0.0 --port 5001 --backend-store-uri sqlite:///mlflow.db --default-artifact-root ./mlruns --serve-artifacts
+mlflow server --host 0.0.0.0 --port 5001 --backend-store-uri sqlite:///mlflow.db --default-artifact-root ./mlruns --serve-artifacts --allowed-hosts "host.docker.internal,host.docker.internal:5001,http://host.docker.internal,http://host.docker.internal:5001"
 ```
 
 this will create an sqlite file named mlflow.db for the backend store where runs and artifacts are stored and a folder named mlruns which will contain your experiment runs
