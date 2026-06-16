@@ -77,12 +77,18 @@ if (len(RUN_ID) > 0 and len(TRACKING_URI) > 0):
     vocab_path = local_dir / artifact_path / "vocab.pt"
     model_path = local_dir / artifact_path / "sms_spam.ckpt"
 
-    vocab = torch.load(vocab_path)
+    model_built = False
 
-    model = SpamClassifier.load_from_checkpoint(
-        model_path,
-        vocab_size=len(vocab),
-    )
+    if (vocab_path.exists() and model_path.exists()):
+
+        vocab = torch.load(vocab_path)
+
+        model = SpamClassifier.load_from_checkpoint(
+            model_path,
+            vocab_size=len(vocab),
+        )
+
+        model_built = True
 
 app = Flask('spam-prediction')
 
@@ -90,15 +96,18 @@ app = Flask('spam-prediction')
 def predict_endpoint():
     text = request.get_json()
 
-    result = predict_sms(
-        text,
-        model,
-        vocab,
-    )
+    if (model_built):
+        result = predict_sms(
+            text,
+            model,
+            vocab,
+        )
 
-    # result = {
-    #     "text": "test"
-    # }
+        result["response"] = "ok"
+    else:
+        result = {
+            "response": "nok"
+        }
 
     # print(result)
 
