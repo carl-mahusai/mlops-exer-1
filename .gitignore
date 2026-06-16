@@ -1,4 +1,5 @@
 mlruns/
+artifacts/
 test_dataset/
 lightning_logs/
 

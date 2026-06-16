@@ -129,6 +129,8 @@ def log_artifacts_manual(mlflow_client, run_id, folder_path, trainer):
         artifact_path="evaluation"
     )
 
+    print(mlflow.get_run(run_id).info.artifact_uri)
+
 class LogArtifactsCallback(Callback):
     def on_train_end(self, trainer, pl_module):
         # Ensure the logger is an MLFlowLogger
