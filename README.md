@@ -12,7 +12,7 @@ this will install the dev requirements
 
 2. start mlflow at the root folder like so
 ```
-mlflow server --port 5001 --backend-store-uri sqlite:///mlflow.db --default-artifact-root ./mlruns
+mlflow server --host 0.0.0.0 --port 5001 --backend-store-uri sqlite:///mlflow.db --default-artifact-root ./mlruns --serve-artifacts
 ```
 
 this will create an sqlite file named mlflow.db for the backend store where runs and artifacts are stored and a folder named mlruns which will contain your experiment runs
@@ -54,7 +54,12 @@ stay on the parent directory and run the following docker build command.
 docker build -f deployment/Dockerfile -t spam-prediction-service-mlflow:v1 .
 ``
 
-to run the container
+to run the container locally
 ```
-docker run -it --rm -p 9696:9696  spam-prediction-service-mlflow:v1
+docker run -it --rm -p 9696:9696 -e RUN_ID=<run id in mlflow> -e TRACKING_URI=<tracking uri used by mlflow> spam-prediction-service-mlflow:v1
+```
+
+for example
+```
+docker run -it --rm -p 9696:9696 -e RUN_ID=fe62180c6adc43ce9ebe761edff4446b -e TRACKING_URI="http://host.docker.internal:5001" --add-host=host.docker.internal:host-gateway spam-prediction-service-mlflow:v1
 ```
