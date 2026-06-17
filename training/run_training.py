@@ -23,12 +23,6 @@ def _setup_parser():
     parser = argparse.ArgumentParser(add_help=False)
 
     # Basic arguments
-    # parser.add_argument(
-    #     "--data", 
-    #     type=convert_to_df,  # Passes the string path through your function
-    #     required=True, 
-    #     help="Path to the CSV file"
-    # )
 
     parser.add_argument(
         "--data", 
@@ -53,6 +47,7 @@ def _setup_parser():
 
     # parser.add_argument(
     #     "--num_workers",
+    
     #     type=int,
     #     default=0,
     #     help="Number of workers for the data module"
