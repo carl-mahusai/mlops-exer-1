@@ -111,7 +111,7 @@ python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_c
 
 you can run with distributed processing by adding the ```--distributed_processing``` argument
 ```
-python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_column='v1' --name_of_message_column='v2' --mlflow_tracking_uri='http://127.0.0.1:5001' --max_epoch=20 --distributed_processing
+python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_column='v1' --name_of_message_column='v2' --mlflow_tracking_uri='http://127.0.0.1:5001' --max_epoch=5 --distributed_processing
 ```
 
 but it may crash when using mllflow with an sqlite db.
