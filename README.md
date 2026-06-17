@@ -69,7 +69,7 @@ Notes regarding the training script
    - --max_epochs. default is 2
 3. Training has early stopping in place where it will stop after 3 validation checks with no decrease in training loss
 3. --mlflow_tracking_uri is optional. if it's ommited, the vocab file and checkpoint file are saved at the root. with mlflow server running and --mlflow_tracking_uri included in the arguments, this will upload the vocab file and checkpoint file to your local mlflow
-4. During testing, when i was using distributed processing with mlflow tracking using sqlite, the part which saves artifacts to mlflow kept crashing even if i had everything setup so that only rank 0 will handle saving. it does sometimes work but just in case you're having issues with training using mlflow with sqlite, don't include this argument. You can run distributed training consistently if you remove ```--mlflow_tracking_uri``` while ```--distributed_processing``` is on although this will save the final checkpoint and vocab files at the root and metrics won't be recorded. you can try to keep running the training until it works. Note that when turned on, it will use the gpu for training.
+4. During testing, when i was using distributed processing with mlflow tracking, the part which saves artifacts to mlflow kept crashing even if i had everything setup so that only rank 0 will handle saving. it does sometimes work but just in case you're having issues with training using mlflow, don't include this argument. You can run distributed training consistently if you remove ```--mlflow_tracking_uri``` while ```--distributed_processing``` is on although this will save the final checkpoint and vocab files at the root and metrics won't be recorded. you can try to keep running the training until it works. Note that when turned on, it will use the gpu for training. This error still happens even when using postgresql which can handle distributed processing. Probably due to how artifacts are saved in the artifacts folder but i couldn't confirm with a local setup. 
 
 
 5. Build the docker file for the predictor
@@ -85,7 +85,7 @@ docker run -it --rm -p 9696:9696 -e RUN_ID=<run id in mlflow> -e TRACKING_URI=<t
 
 for a local run, add ```--add-host=host.docker.internal:host-gateway``` and use "http://host.docker.internal:5001" for the tracking uri. this will connect to the mlflow setup running 
 ```
-docker run -it --rm -p 9696:9696 -e RUN_ID=4dd828b74f45458f89436efc7eea1fde -e TRACKING_URI="http://host.docker.internal:5001" --add-host=host.docker.internal:host-gateway spam-prediction-service-mlflow:v1
+docker run -it --rm -p 9696:9696 -e RUN_ID=3096bcb13e084fa2a52dbf1a55620e6f -e TRACKING_URI="http://host.docker.internal:5001" --add-host=host.docker.internal:host-gateway spam-prediction-service-mlflow:v1
 ```
 
 to test that the blackbox container running locally can connect to your mlflow setup that's also running locally, run the following in the container
