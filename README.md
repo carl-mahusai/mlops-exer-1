@@ -17,19 +17,73 @@ mlflow server --port 5001 --backend-store-uri sqlite:///mlflow.db --artifacts-de
 
 this will run mlflow server, create an sqlite file named mlflow.db for the backend store where runs metrics are stored and a folder named mlruns which will contain your experiment artifacts. ```--allowed-hosts``` will allow connections from the listed hosts. The listed hosts are for the black box docker container.
 
-if you want to use postgresql for the backend-store-uri, you can do so like this
-a. install ```psycopg2-binary```
+if you want to use postgresql for the backend-store-uri and you're using WSL2 and windows, do the following
+1. Install postgresql
+2. Open ```Windows Defender Firewall with Advanced Security```
+3. Click ```New Rule...```
+4. Select ```Port``` for rule type
+5. Select ```TCP``` and for ```Specific local ports``` enter ```5432```
+6. Select ```Allow the connection```. Connecting from WSL2 won't be secure so don't select the secure option
+7. Select at least ```Public```. Can select ```Domain``` and ```Private``` as well. I could only connect if ```Public``` was selected
+8. Name the rule e.g. ```Postgres - connect from WSL2``` and create it
+9. Right click newly created rule and select ```Properties``` then click on the ```Scope``` tab
+10. Under ```Remote IP address```, select ```These IP addresses``` then click ```Add...``` and enter range ```172.0.0.1``` to ```172.254.254.254```
+11. Repeat step 9 for IP address range ```192.0.0.1``` to ```192.254.254.254```
+12. Click ```Apply``` then ```OK```
+13. Make sure rule is enabled
+
+Afterwards, configure postgres to accept WSL2 connections
+
+1. Go to ```C:\Program Files\PostgreSQL\$VERSION\data```
+2. Verify that postgresql.conf has following set:
+```
+listen_addresses = '*'
+```
+3. Update pg_hba.conf to allow connections from WSL2 range e.g. for Postgresl 12:
+```
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+
+# IPv4 local connections:
+host    all             all             127.0.0.1/32            md5
+host    all             all             172.0.0.0/8             md5
+host    all             all             192.0.0.0/8             md5
+```
+
+For Postgresql 13+ you should use scram-sha-256
+4. Restart postgresql
+
+In your bash loading file, like ```.bashrc```, ```.zshrc```, or ```.bash_profile```, add the following
+```
+# Map Windows host IP as winhost (based on default route, not /etc/resolv.conf)
+if ! grep -q 'winhost' /etc/hosts; then
+  echo 'Adding Windows host IP as winhost...'
+  WINIP=$(ip route | grep default | awk '{print $3}')
+  echo -e "\n# Windows host for PostgreSQL\n$WINIP   winhost" | sudo tee -a /etc/hosts
+fi
+```
+this adds the host ip address to your host and assigns it to ```winhost```.
+
+5. Install PSQL only in WSL2. the postgresql server is already running in the host and you don't want an extra postgresql server running in WSL2
+6. try logging in to postgresql
+```
+psql -h winhost -p 5432 -U postgres
+```
+
+once you can connect to your postgresql server in the host from WSL2, do the following
+a. install ```psycopg2-binary``` in the virtual env of the exercise. this is already in the requirements file
 ```
 pip install psycopg2-binary
 ```
-change the owner of your mlflow db to your mlflow user
+b. create a new mlflow db, let's say ```mlflow_metrics```. also create a new user in postgresql, let's also call it ```mlflow_metrics```
+c. change the owner of your mlflow db to your mlflow user and update the privileges.
 ```
-GRANT ALL PRIVILEGES ON DATABASE <mlflow_db> TO <mlflow_db_user>;
-ALTER DATABASE <mlflow_db> OWNER TO <mlflow_db_user>;
+GRANT ALL PRIVILEGES ON DATABASE mlflow_metrics TO mlflow_metrics;
+ALTER DATABASE mlflow_metrics OWNER TO mlflow_metrics;
 ```
+d. Try logging in to your mlflow metrics db with the mlflow metrics user
 
 
-change your mlflow server's backend-store-uri like this
+Once that's done, you can change your mlflow server's backend-store-uri like this
 ```
 mlflow server --port 5001 --backend-store-uri postgresql://<db_user>:<db_password>@<db_host>:<db_port>/<database_name> --artifacts-destination ./artifacts --serve-artifacts --allowed-hosts "host.docker.internal,host.docker.internal:*,http://host.docker.internal,http://host.docker.internal:*,localhost,localhost:*,http://localhost,http://localhost:*,http://127.0.0.1:*,http://127.0.0.1,127.0.0.1,127.0.0.1:*"
 ```
@@ -85,7 +139,7 @@ docker run -it --rm -p 9696:9696 -e RUN_ID=<run id in mlflow> -e TRACKING_URI=<t
 
 for a local run, add ```--add-host=host.docker.internal:host-gateway``` and use "http://host.docker.internal:5001" for the tracking uri. this will connect to the mlflow setup running 
 ```
-docker run -it --rm -p 9696:9696 -e RUN_ID=3096bcb13e084fa2a52dbf1a55620e6f -e TRACKING_URI="http://host.docker.internal:5001" --add-host=host.docker.internal:host-gateway spam-prediction-service-mlflow:v1
+docker run -it --rm -p 9696:9696 -e RUN_ID=46f9b968655b4a32aa165290767e1eb0 -e TRACKING_URI="http://host.docker.internal:5001" --add-host=host.docker.internal:host-gateway spam-prediction-service-mlflow:v1
 ```
 
 to test that the blackbox container running locally can connect to your mlflow setup that's also running locally, run the following in the container
