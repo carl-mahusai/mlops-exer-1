@@ -14,7 +14,7 @@ class SMSDataset(Dataset):
         self.max_length = max_length
 
         if (not vocab):
-            self.vocab = self.build_vocab()
+            self.vocab = self.build_vocab(texts=texts)
         else:
             self.vocab = vocab
         
