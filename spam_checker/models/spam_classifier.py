@@ -67,8 +67,10 @@ class SpamClassifier(L.LightningModule):
     def training_step(self, batch, batch_idx):
         loss, acc = self.shared_step(batch)
 
-        self.log("train_loss", loss, sync_dist=True)
-        self.log("train_acc", acc, sync_dist=True)
+        # self.log("train_loss", loss, sync_dist=True)
+        # self.log("train_acc", acc, sync_dist=True)
+        self.log("train_loss", loss)
+        self.log("train_acc", acc)
 
         return loss
 
