@@ -17,6 +17,29 @@ mlflow server --port 5001 --backend-store-uri sqlite:///mlflow.db --artifacts-de
 
 this will run mlflow server, create an sqlite file named mlflow.db for the backend store where runs metrics are stored and a folder named mlruns which will contain your experiment artifacts. ```--allowed-hosts``` will allow connections from the listed hosts. The listed hosts are for the black box docker container.
 
+if you want to use postgresql for the backend-store-uri, you can do so like this
+a. install ```psycopg2-binary```
+```
+pip install psycopg2-binary
+```
+change the owner of your mlflow db to your mlflow user
+```
+GRANT ALL PRIVILEGES ON DATABASE <mlflow_db> TO <mlflow_db_user>;
+ALTER DATABASE <mlflow_db> OWNER TO <mlflow_db_user>;
+```
+
+
+change your mlflow server's backend-store-uri like this
+```
+mlflow server --port 5001 --backend-store-uri postgresql://<db_user>:<db_password>@<db_host>:<db_port>/<database_name> --artifacts-destination ./artifacts --serve-artifacts --allowed-hosts "host.docker.internal,host.docker.internal:*,http://host.docker.internal,http://host.docker.internal:*,localhost,localhost:*,http://localhost,http://localhost:*,http://127.0.0.1:*,http://127.0.0.1,127.0.0.1,127.0.0.1:*"
+```
+
+for my local setup, it would be like this
+```
+mlflow server --port 5001 --backend-store-uri postgresql://mlflow_metrics:WBev24h4@winhost:5432/mlflow_metrics --artifacts-destination ./artifacts --serve-artifacts --allowed-hosts "host.docker.internal,host.docker.internal:*,http://host.docker.internal,http://host.docker.internal:*,localhost,localhost:*,http://localhost,http://localhost:*,http://127.0.0.1:*,http://127.0.0.1,127.0.0.1,127.0.0.1:*"
+```
+
+
 you can view mlflow in
 ```
 http://127.0.0.1:5001
