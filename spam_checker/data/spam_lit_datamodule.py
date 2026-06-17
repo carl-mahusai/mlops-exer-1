@@ -5,6 +5,8 @@ from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
 from spam_checker.data.spam_dataset import SMSDataset
 
+from spam_checker.data.util import build_vocab_util
+
 
 class SMSDataModule(L.LightningDataModule):
     def __init__(self, dataframe, batch_size=32, max_vocab_size=10000, max_length=50, num_workers = 0, persistent_workers = False, vocab = None):
@@ -29,25 +31,31 @@ class SMSDataModule(L.LightningDataModule):
         #     self.on_gpu = True
 
 
+    # def build_vocab(self, texts):
+    #     counter = Counter()
+
+    #     for text in texts:
+    #         counter.update(
+    #             str(text).lower().split()
+    #         )
+
+    #     vocab = {
+    #         "<PAD>": 0,
+    #         "<UNK>": 1,
+    #     }
+
+    #     for token, _ in counter.most_common(
+    #         self.max_vocab_size - 2
+    #     ):
+    #         vocab[token] = len(vocab)
+
+    #     return vocab
+
     def build_vocab(self, texts):
-        counter = Counter()
-
-        for text in texts:
-            counter.update(
-                str(text).lower().split()
-            )
-
-        vocab = {
-            "<PAD>": 0,
-            "<UNK>": 1,
-        }
-
-        for token, _ in counter.most_common(
-            self.max_vocab_size - 2
-        ):
-            vocab[token] = len(vocab)
-
-        return vocab
+        return build_vocab_util(
+            texts=texts,
+            max_vocab_size=self.max_vocab_size
+        )
 
     def setup(self, stage=None):
         df = self.df.copy()
@@ -82,6 +90,7 @@ class SMSDataModule(L.LightningDataModule):
             train_df["label"].tolist(),
             self.vocab,
             self.max_length,
+            self.max_vocab_size
         )
 
         self.val_dataset = SMSDataset(
@@ -89,6 +98,7 @@ class SMSDataModule(L.LightningDataModule):
             val_df["label"].tolist(),
             self.vocab,
             self.max_length,
+            self.max_vocab_size
         )
 
         self.test_dataset = SMSDataset(
@@ -96,6 +106,7 @@ class SMSDataModule(L.LightningDataModule):
             test_df["label"].tolist(),
             self.vocab,
             self.max_length,
+            self.max_vocab_size
         )
 
     def train_dataloader(self):
