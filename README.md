@@ -119,8 +119,9 @@ but it may crash when using mllflow with an sqlite db.
 Notes regarding the training script
 1. The label column should contain "ham" for non-spam messages and "spam" for spam messages. you may add other columns aside from the label and messages column but those would be ignored
 2. The optional commands are
-   - --batch_size. default is 64
+   - --batch_size. default is 8
    - --max_epochs. default is 2
+3. For the --batch_size argument, training uses gradient accumulation with a value of 4. so the effective batch size is ```--batch_size x 4```. So for the default value of 8, the effective batch size would be 8 while running a batch size of 32.
 3. Training has early stopping in place where it will stop after 3 validation checks with no decrease in training loss
 3. --mlflow_tracking_uri is optional. if it's ommited, the vocab file and checkpoint file are saved at the root. with mlflow server running and --mlflow_tracking_uri included in the arguments, this will upload the vocab file and checkpoint file to your local mlflow
 4. During testing, when i was using distributed processing with mlflow tracking, the part which saves artifacts to mlflow kept crashing even if i had everything setup so that only rank 0 will handle saving. it does sometimes work but just in case you're having issues with training using mlflow, don't include this argument. You can run distributed training consistently if you remove ```--mlflow_tracking_uri``` while ```--distributed_processing``` is on although this will save the final checkpoint and vocab files at the root and metrics won't be recorded. you can try to keep running the training until it works. Note that when turned on, it will use the gpu for training. This error still happens even when using postgresql which can handle distributed processing. Probably due to how artifacts are saved in the artifacts folder but i couldn't confirm with a local setup since i'm using a local store. this will probably work better with an s3 setup

@@ -47,7 +47,7 @@ def _setup_parser():
 
     # parser.add_argument(
     #     "--num_workers",
-    
+
     #     type=int,
     #     default=0,
     #     help="Number of workers for the data module"
@@ -57,9 +57,9 @@ def _setup_parser():
     parser.add_argument(
         "--batch_size",
         type=int,
-        default=64,
+        default=8,
         help="Batch size for data module"
-        + " Default is 64.",
+        + " Default is 8.",
     )
 
     parser.add_argument(
@@ -280,6 +280,8 @@ def main():
                 strategy="ddp",           # Uses Distributed Data Parallel
                 num_nodes=1,              # Set >1 for multi-machine setups
                 # use_distributed_sampler=False
+                accumulate_grad_batches=4,
+                precision="16-mixed",
             )
         else:
             print("calling single processing")

@@ -8,7 +8,9 @@ class SpamClassifier(L.LightningModule):
     def __init__(
         self,
         vocab_size,
-        embedding_dim=128,
+        # embedding_dim=128,
+        # hidden_dim=64,
+        embedding_dim=64,
         hidden_dim=64,
         lr=1e-3,
     ):
