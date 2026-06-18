@@ -130,7 +130,7 @@ def log_artifacts_manual(mlflow_client, run_id, folder_path, trainer):
     vocab_pt_file_path = folder_path + "vocab.pt"
     sms_spam_checkpoint_file_path = folder_path + "sms_spam.ckpt"
 
-    if (not trainer.strategy.strategy_name):
+    if (not hasattr(trainer.strategy, "strategy_name")):
         print("strategy name unknown, most likely ddp")
     else:
         print(trainer.strategy.strategy_name)
