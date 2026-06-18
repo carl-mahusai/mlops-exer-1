@@ -4,9 +4,27 @@ import os
 from mlflow.tracking import MlflowClient
 import mlflow.artifacts
 from pathlib import Path
+from deepspeed.utils.zero_to_fp32 import get_fp32_state_dict_from_zero_checkpoint
 
 from spam_checker.models.spam_classifier import SpamClassifier
 from spam_checker.predict_sms import predict_sms
+
+def return_module_args(s):
+    # Check for integer first
+    try:
+        int_variable = int(s)
+        return int_variable
+    except ValueError:
+        pass
+    
+    # Check for float next
+    try:
+        float_variable = float(s)
+        return float_variable
+    except ValueError:
+        pass
+        
+    return s
 
 def list_all_artifacts_recursive(client, run_id):
     # client = MlflowClient()
@@ -55,6 +73,14 @@ if (len(RUN_ID) > 0 and len(TRACKING_URI) > 0):
     print("Tags:", run_info.data.tags)
     print(run_info.info.artifact_uri)
 
+    all_tags = run_info.data.tags
+
+    processing_tag_check = all_tags.get("processing")
+
+    processing = "single"
+
+    if (processing_tag_check):
+        processing = processing_tag_check
 
 
     # Download using the specified client instance
@@ -80,18 +106,58 @@ if (len(RUN_ID) > 0 and len(TRACKING_URI) > 0):
 
     model_built = False
     if (vocab_path.exists() and model_path.exists()):
-        try:
-            vocab = torch.load(vocab_path)
+        vocab = torch.load(vocab_path)
+        if (processing == "single"):
+            try:
+                
 
-            model = SpamClassifier.load_from_checkpoint(
-                model_path,
-                vocab_size=len(vocab),
-            )
+                model = SpamClassifier.load_from_checkpoint(
+                    model_path,
+                    vocab_size=len(vocab),
+                )
 
-            model_built = True
-        except Exception as e:
-            model_built = False
-            error_message = str(e)
+                model_built = True
+            except Exception as e:
+                model_built = False
+                error_message = str(e)
+                print(error_message)
+        else:
+            try:
+                print("setup multi processing checkpoint load here")
+
+                state_dict = get_fp32_state_dict_from_zero_checkpoint(model_path)
+
+                new_dict = {}
+
+                for key, value in run_info.data.params.items():
+                    print(f"Key: {key} | Value: {value}")
+                    new_dict_value = return_module_args(value)
+                    new_dict[key] = new_dict_value
+
+                print(new_dict)
+                try:
+                    model = SpamClassifier(**new_dict)
+                    model.load_state_dict(state_dict)
+                    model_built = True
+                except Exception as e:
+                    model_built = False
+                    error_message = str(e)
+                    print("inner except - initial build from dict failed - ", error_message, sep="\n")
+                    print("attempting backup model build")
+                    try:
+                        model = SpamClassifier(
+                            vocab_size=len(vocab)
+                        )
+                        model.load_state_dict(state_dict)
+                        model_built = True
+                    except Exception as e:
+                        model_built = False
+                        error_message = str(e)
+                        print("inner except - final build attempt failed - ", error_message, sep="\n")
+            except Exception as e:
+                model_built = False
+                error_message = str(e)
+                print("outer except - ", error_message, sep="\n")
 
 app = Flask('spam-prediction')
 
