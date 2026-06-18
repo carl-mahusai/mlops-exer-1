@@ -114,7 +114,7 @@ you can run with distributed processing by adding the ```--distributed_processin
 python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_column='v1' --name_of_message_column='v2' --mlflow_tracking_uri='http://127.0.0.1:5001' --max_epoch=5 --accelerator="gpu" --devices=1 --distributed_processing
 ```
 
-but you have to install nvidia cuda toolkit as this uses deep speed
+but you have to install nvidia cuda toolkit as this uses deep speed for distributed processing
 ```
 sudo apt update
 sudo apt install nvidia-cuda-toolkit
