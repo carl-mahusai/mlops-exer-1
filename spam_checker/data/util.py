@@ -64,5 +64,5 @@ def build_vocab_util(texts, max_vocab_size):
         max_vocab_size - 2
     ):
         vocab[token] = len(vocab)
-    print(vocab)
+    # print(vocab)
     return vocab

@@ -280,13 +280,11 @@ def main():
                 devices=devices, 
                 logger=mlflow_logger,
                 callbacks=callbacks,
-                # strategy="ddp",           # Uses Distributed Data Parallel
-                # num_nodes=1,              # Set >1 for multi-machine setups
-                strategy=FSDPStrategy(auto_wrap_policy=True),
-                # use_distributed_sampler=False
+                strategy="ddp",           # Uses Distributed Data Parallel
+                num_nodes=1,              # Set >1 for multi-machine setups
                 accumulate_grad_batches=4,
                 # precision="16-mixed",
-                precision="bf16-mixed",
+                # precision="bf16-mixed",
                 # enable_checkpointing=False
             )
         else:
@@ -298,7 +296,7 @@ def main():
                 logger=mlflow_logger,
                 callbacks=callbacks,
                 accumulate_grad_batches=4,
-                precision="bf16-mixed",
+                # precision="16-mixed",
             )
         print("<------------------------trainer build complete-------------------------------->")
 
@@ -316,7 +314,9 @@ def main():
 
         print("<------------------------trainer test complete-------------------------------->")
 
-        if (len(callbacks) <= 0):
+        has_log_callback = any(isinstance(item, LogArtifactsCallback) for item in callbacks)
+
+        if (not has_log_callback):
             torch.save(data.vocab, "vocab.pt")
             trainer.save_checkpoint("sms_spam.ckpt")
 
