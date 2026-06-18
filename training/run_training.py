@@ -89,16 +89,16 @@ def _setup_parser():
     parser.add_argument(
         "--devices", 
         type=str,  # Passes the string path through your function
-        default="auto",
+        default="1",
         help="Devices to be used per training node"
     )
 
-    parser.add_argument(
-        "--strategy", 
-        type=str,  # Passes the string path through your function
-        default="fsdp",
-        help="Tracking uri to be used by mlflow"
-    )
+    # parser.add_argument(
+    #     "--strategy", 
+    #     type=str,  # Passes the string path through your function
+    #     default="auto",
+    #     help="Tracking uri to be used by mlflow"
+    # )
 
     parser.add_argument(
         "--mlflow_tracking_uri", 
@@ -267,8 +267,9 @@ def main():
         accelerator = args.accelerator
         devices = args.devices
         # strategy_args = args.strategy
-        strategy = args.strategy
+        strategy = "auto"
         num_nodes = args.num_nodes
+        devices = args.devices
 
         data = SMSDataModule(
             dataframe=df,
@@ -292,10 +293,15 @@ def main():
         if (args.distributed_processing):
 
             print("calling distributed processing")
-            if(gpus > 0 and accelerator == "auto"):
-                accelerator = "gpu"
-                if (devices == "auto"):
-                    devices = gpus
+            strategy = "deepspeed"
+            # if(gpus > 0 and accelerator == "auto"):
+            #     accelerator = "gpu"
+            # if (devices == 1):
+            #     devices = gpus
+            # else:
+            #     devices = args.devices
+            # num_nodes = args.num_nodes
+
 
         #     trainer = Trainer(
         #         max_epochs=max_epochs,
