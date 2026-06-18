@@ -86,6 +86,13 @@ def _setup_parser():
     )
 
     parser.add_argument(
+        "--strategy", 
+        type=str,  # Passes the string path through your function
+        default="fsdp",
+        help="Tracking uri to be used by mlflow"
+    )
+
+    parser.add_argument(
         "--mlflow_tracking_uri", 
         type=str,  # Passes the string path through your function
         default="",
@@ -246,6 +253,7 @@ def main():
         max_epochs = args.max_epochs
         accelerator = args.accelerator
         devices = args.devices
+        strategy = args.strategy
 
         data = SMSDataModule(
             dataframe=df,
@@ -280,8 +288,7 @@ def main():
                 devices=devices, 
                 logger=mlflow_logger,
                 callbacks=callbacks,
-                # strategy="ddp",           # Uses Distributed Data Parallel
-                strategy="deepspeed",
+                strategy=strategy,
                 num_nodes=1,              # Set >1 for multi-machine setups
                 accumulate_grad_batches=4,
                 # enable_checkpointing=False
