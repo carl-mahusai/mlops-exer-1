@@ -79,10 +79,18 @@ def _setup_parser():
     )
 
     parser.add_argument(
+        "--num_nodes",
+        type=int,
+        default=1,
+        help="number of nodes to train on"
+        + " Default is 1.",
+    )
+
+    parser.add_argument(
         "--devices", 
         type=str,  # Passes the string path through your function
         default="auto",
-        help="Devices for the trainer"
+        help="Devices to be used per training node"
     )
 
     parser.add_argument(
@@ -254,6 +262,7 @@ def main():
         accelerator = args.accelerator
         devices = args.devices
         strategy = args.strategy
+        num_nodes = args.num_nodes
 
         data = SMSDataModule(
             dataframe=df,
@@ -282,28 +291,39 @@ def main():
                 if (devices == "auto"):
                     devices = gpus
 
-            trainer = Trainer(
-                max_epochs=max_epochs,
-                accelerator=accelerator,
-                devices=devices, 
-                logger=mlflow_logger,
-                callbacks=callbacks,
-                strategy=strategy,
-                num_nodes=1,              # Set >1 for multi-machine setups
-                accumulate_grad_batches=4,
-                # enable_checkpointing=False
-            )
-        else:
-            print("calling single processing")
-            trainer = Trainer(
-                max_epochs=max_epochs,
-                accelerator=accelerator,
-                devices=devices, 
-                logger=mlflow_logger,
-                callbacks=callbacks,
-                accumulate_grad_batches=4,
-                # precision="16-mixed",
-            )
+        #     trainer = Trainer(
+        #         max_epochs=max_epochs,
+        #         accelerator=accelerator,
+        #         devices=devices, 
+        #         logger=mlflow_logger,
+        #         callbacks=callbacks,
+        #         strategy=strategy,
+        #         num_nodes=num_nodes,
+        #         accumulate_grad_batches=4,
+        #     )
+        # else:
+        #     print("calling single processing")
+        #     trainer = Trainer(
+        #         max_epochs=max_epochs,
+        #         accelerator=accelerator,
+        #         devices=devices, 
+        #         logger=mlflow_logger,
+        #         callbacks=callbacks,
+        #         strategy=strategy,
+        #         num_nodes=num_nodes,
+        #         accumulate_grad_batches=4,
+        #     )
+
+        trainer = Trainer(
+            max_epochs=max_epochs,
+            accelerator=accelerator,
+            devices=devices, 
+            logger=mlflow_logger,
+            callbacks=callbacks,
+            strategy=strategy,
+            num_nodes=num_nodes,
+            accumulate_grad_batches=4,
+        )
         print("<------------------------trainer build complete-------------------------------->")
 
         trainer.fit(
