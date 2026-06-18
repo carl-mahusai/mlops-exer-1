@@ -125,7 +125,7 @@ Notes regarding the training script
 2. The optional commands are
    - --batch_size. default is 8
    - --max_epochs. default is 2
-3. For the --batch_size argument, training uses gradient accumulation with a value of 4. so the effective batch size is ```--batch_size x 4```. So for the default value of 8, the effective batch size would be 8 while running a batch size of 32.
+3. For the --batch_size argument, training uses gradient accumulation with a value of 4. so the effective batch size is ```--batch_size x 4```. So for the default value of 8, the effective batch size memory would be 8 while running a batch size of 32.
 3. Training has early stopping in place where it will stop after 3 validation checks with no decrease in training loss
 3. --mlflow_tracking_uri is optional. if it's ommited, the vocab file and checkpoint file are saved at the root. with mlflow server running and --mlflow_tracking_uri included in the arguments, this will upload the vocab file and checkpoint file to your local mlflow
 4. If you're on a laptop which uses nvidia optimus, make sure to set it to use your discrete gpu. I experienced frequent crashes because I believe it was using integrated graphics. If you still experience crashes, don't use distributed processing and test the training script
