@@ -284,7 +284,7 @@ def main():
                 strategy="deepspeed",
                 num_nodes=1,              # Set >1 for multi-machine setups
                 accumulate_grad_batches=4,
-                # precision="16-mixed",
+                precision="16-mixed",
                 # precision="bf16-mixed",
                 # enable_checkpointing=False
             )
