@@ -8,6 +8,7 @@ from lightning.pytorch.loggers import MLFlowLogger
 from lightning import Trainer
 from lightning.pytorch.callbacks import Callback, EarlyStopping
 from lightning.pytorch.utilities.rank_zero import rank_zero_only
+from lightning.pytorch.strategies import FSDPStrategy
 
 from spam_checker.data.spam_lit_datamodule import SMSDataModule
 from spam_checker.models.spam_classifier import SpamClassifier
@@ -270,6 +271,8 @@ def main():
             print("calling distributed processing")
             if(gpus > 0 and accelerator == "auto"):
                 accelerator = "gpu"
+                if (devices == "auto"):
+                    devices = gpus
 
             trainer = Trainer(
                 max_epochs=max_epochs,
@@ -277,8 +280,9 @@ def main():
                 devices=devices, 
                 logger=mlflow_logger,
                 callbacks=callbacks,
-                strategy="ddp",           # Uses Distributed Data Parallel
-                num_nodes=1,              # Set >1 for multi-machine setups
+                # strategy="ddp",           # Uses Distributed Data Parallel
+                # num_nodes=1,              # Set >1 for multi-machine setups
+                strategy=FSDPStrategy(auto_wrap_policy=True),
                 # use_distributed_sampler=False
                 accumulate_grad_batches=4,
                 # precision="16-mixed",
@@ -292,7 +296,9 @@ def main():
                 accelerator=accelerator,
                 devices=devices, 
                 logger=mlflow_logger,
-                callbacks=callbacks
+                callbacks=callbacks,
+                accumulate_grad_batches=4,
+                precision="bf16-mixed",
             )
         print("<------------------------trainer build complete-------------------------------->")
 
