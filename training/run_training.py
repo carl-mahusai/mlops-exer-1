@@ -280,7 +280,8 @@ def main():
                 devices=devices, 
                 logger=mlflow_logger,
                 callbacks=callbacks,
-                strategy="ddp",           # Uses Distributed Data Parallel
+                # strategy="ddp",           # Uses Distributed Data Parallel
+                strategy="deepspeed",
                 num_nodes=1,              # Set >1 for multi-machine setups
                 accumulate_grad_batches=4,
                 # precision="16-mixed",
