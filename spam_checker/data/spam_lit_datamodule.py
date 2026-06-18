@@ -9,7 +9,7 @@ from spam_checker.data.util import build_vocab_util
 
 
 class SMSDataModule(L.LightningDataModule):
-    def __init__(self, dataframe, batch_size=8, max_vocab_size=10000, max_length=50, num_workers = 0, persistent_workers = True, vocab = None):
+    def __init__(self, dataframe, batch_size=8, max_vocab_size=10000, max_length=50, num_workers = 0, vocab = None):
         super().__init__()
 
         self.df = dataframe.copy()
@@ -20,8 +20,10 @@ class SMSDataModule(L.LightningDataModule):
         self.num_workers = num_workers
 
         self.vocab = vocab
-
-        self.persistent_workers = persistent_workers
+        if (num_workers > 0):
+            self.persistent_workers = True
+        else:
+            self.persistent_workers = False
 
         # self.gpus = int(torch.cuda.is_available())
 
