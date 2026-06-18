@@ -8,7 +8,8 @@ from lightning.pytorch.loggers import MLFlowLogger
 from lightning import Trainer
 from lightning.pytorch.callbacks import Callback, EarlyStopping
 from lightning.pytorch.utilities.rank_zero import rank_zero_only
-from lightning.pytorch.strategies import FSDPStrategy
+from lightning.pytorch.strategies import FSDPStrategy, DeepSpeedStrategy
+from torch.distributed.fsdp import StateDictType
 
 from spam_checker.data.spam_lit_datamodule import SMSDataModule
 from spam_checker.models.spam_classifier import SpamClassifier
@@ -128,6 +129,11 @@ def log_artifacts_manual(mlflow_client, run_id, folder_path, trainer):
     data = trainer.datamodule
     vocab_pt_file_path = folder_path + "vocab.pt"
     sms_spam_checkpoint_file_path = folder_path + "sms_spam.ckpt"
+
+    if (not trainer.strategy.strategy_name):
+        print("strategy name unknown, most likely ddp")
+    else:
+        print(trainer.strategy.strategy_name)
 
     torch.save(data.vocab, vocab_pt_file_path)
     trainer.save_checkpoint(sms_spam_checkpoint_file_path)
@@ -260,6 +266,7 @@ def main():
         max_epochs = args.max_epochs
         accelerator = args.accelerator
         devices = args.devices
+        # strategy_args = args.strategy
         strategy = args.strategy
         num_nodes = args.num_nodes
 
