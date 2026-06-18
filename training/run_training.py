@@ -48,7 +48,6 @@ def _setup_parser():
 
     # parser.add_argument(
     #     "--num_workers",
-
     #     type=int,
     #     default=0,
     #     help="Number of workers for the data module"

@@ -9,7 +9,7 @@ from spam_checker.data.util import build_vocab_util
 
 
 class SMSDataModule(L.LightningDataModule):
-    def __init__(self, dataframe, batch_size=8, max_vocab_size=10000, max_length=50, num_workers = 0, persistent_workers = False, vocab = None):
+    def __init__(self, dataframe, batch_size=8, max_vocab_size=10000, max_length=50, num_workers = 0, persistent_workers = True, vocab = None):
         super().__init__()
 
         self.df = dataframe.copy()
