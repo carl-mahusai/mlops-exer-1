@@ -162,3 +162,13 @@ to test the docker container, from the root folder, run this in your CLI
 ```
 python deployment/endpoint/test.py
 ```
+
+to launch the sample gradio interface, from the root folder run this in your CLI
+```
+python deployment/gradio/interface.py --api-url=<prediction endpoint>
+```
+
+for the local example, this would be
+```
+python deployment/gradio/interface.py --api-url=http://localhost:9696/predict
+```
