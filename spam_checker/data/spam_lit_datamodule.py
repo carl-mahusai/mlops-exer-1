@@ -82,7 +82,7 @@ class SMSDataModule(L.LightningDataModule):
             random_state=42,
         )
 
-        if (not self.vocab):
+        if (self.vocab is None):
             self.vocab = self.build_vocab(
                 train_df["message"]
             )
