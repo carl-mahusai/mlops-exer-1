@@ -109,7 +109,7 @@ for example
 python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_column='v1' --name_of_message_column='v2' --mlflow_tracking_uri='http://127.0.0.1:5001'
 ```
 
-you can run with distributed processing by adding the ```--distributed_processing``` argument
+you can run with distributed processing by adding the ```--distributed_processing```
 ```
 python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_column='v1' --name_of_message_column='v2' --mlflow_tracking_uri='http://127.0.0.1:5001' --max_epoch=5 --accelerator="gpu" --devices=1 --distributed_processing
 ```
@@ -138,7 +138,7 @@ Notes regarding the training script
 5. Build the docker file for the predictor
 stay on the parent directory and run the following docker build command. 
 ```
-docker build -f deployment/Dockerfile -t spam-prediction-service-mlflow:v1 .
+docker build -f deployment/endpoint/Dockerfile -t spam-prediction-service-mlflow:v1 .
 ```
 
 to run the container locally
@@ -148,7 +148,7 @@ docker run -it --rm -p 9696:9696 -e RUN_ID=<run id in mlflow> -e TRACKING_URI=<t
 
 for a local run, add ```--add-host=host.docker.internal:host-gateway``` and use "http://host.docker.internal:5001" for the tracking uri. this will connect to the mlflow setup running 
 ```
-docker run -it --rm -p 9696:9696 -e RUN_ID=a870decb79ad4de6976aebcda8a71bc3 -e TRACKING_URI="http://host.docker.internal:5001" --add-host=host.docker.internal:host-gateway spam-prediction-service-mlflow:v1
+docker run -it --rm -p 9696:9696 -e RUN_ID=f7b389b95ac44323875fd691d2a87efa -e TRACKING_URI="http://host.docker.internal:5001" --add-host=host.docker.internal:host-gateway spam-prediction-service-mlflow:v1
 ```
 
 to test that the blackbox container running locally can connect to your mlflow setup that's also running locally, run the following in the container
@@ -160,5 +160,5 @@ check your local mlflow server. it should return a 200 response
 
 to test the docker container, from the root folder, run this in your CLI
 ```
-python deployment/test.py
+python deployment/endpoint/test.py
 ```

@@ -16,7 +16,7 @@ RUN pip install --no-cache-dir -r requirements-dev.txt
 # COPY [ "sms_spam.ckpt", "./" ]
 # COPY [ "vocab.pt", "./" ]
 
-COPY [ "deployment/predict.py", "./" ]
+COPY [ "deployment/endpoint/predict.py", "./" ]
 
 COPY [ "spam_checker", "./spam_checker" ]
 
