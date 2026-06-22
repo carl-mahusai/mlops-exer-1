@@ -9,6 +9,7 @@ from lightning.pytorch.utilities.rank_zero import rank_zero_only
 from lightning.pytorch.strategies import FSDPStrategy, DeepSpeedStrategy
 from torch.distributed.fsdp import StateDictType
 
+import training.metadata.tuning as tuning_metadata
 from spam_checker.data.spam_lit_datamodule import SMSDataModule
 from spam_checker.models.spam_classifier import SpamClassifier
 
@@ -84,14 +85,15 @@ early_stop_acc = EarlyStopping(
 def train_model(
     args,
     df, 
-    best={        
-        "embedding_dim": 64,
-        "hidden_dim": 64,
-        "lr": 1e-3,
-        "max_length": 50,
-        "max_vocab_size": 5000,
-        "batch_size": 16
-    },
+    # best={        
+    #     "embedding_dim": 64,
+    #     "hidden_dim": 64,
+    #     "lr": 1e-3,
+    #     "max_length": 50,
+    #     "max_vocab_size": 5000,
+    #     "batch_size": 16
+    # },
+    best = tuning_metadata.BASE_PARAMETERS,
     tuned=False
 ):
     multiprocessing.set_start_method("spawn", force=True)

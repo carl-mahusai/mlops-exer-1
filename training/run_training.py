@@ -5,7 +5,7 @@ import optuna
 
 from training.final_training import train_model
 from training.hyperparameter_search import objective
-
+import training.metadata.tuning as tuning_metadata
 
 def convert_to_df(file_path):
     try:
@@ -159,14 +159,16 @@ def main():
             df = df.rename(columns={label_column: "label", message_column: "message"})
 
 
-    best={
-        "embedding_dim": 64,
-        "hidden_dim": 64,
-        "lr": 1e-3,
-        "max_length": 50,
-        "max_vocab_size": 5000,
-        "batch_size": 16
-    }
+    # best={
+    #     "embedding_dim": 64,
+    #     "hidden_dim": 64,
+    #     "lr": 1e-3,
+    #     "max_length": 50,
+    #     "max_vocab_size": 5000,
+    #     "batch_size": 16
+    # }
+
+    best = tuning_metadata.BASE_PARAMETERS
 
     tuned = False
 

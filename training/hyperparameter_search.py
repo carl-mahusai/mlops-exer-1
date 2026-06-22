@@ -4,7 +4,7 @@ import lightning as L
 
 from spam_checker.data.spam_lit_datamodule import SMSDataModule
 from spam_checker.models.spam_classifier import SpamClassifier
-
+import training.metadata.tuning as tuning_metadata
 
 def objective(trial, dataframe, args):
 
