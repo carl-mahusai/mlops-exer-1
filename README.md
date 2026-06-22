@@ -122,6 +122,9 @@ sudo apt install nvidia-cuda-toolkit
 
 tried using ddp for the training but that was causing very frequent crashes. ```fsdp``` sometimes crashes as well but not as frequently as ```ddp```. ```deepspeed``` was a very consistent performer which is why i used this more.
 
+
+
+
 Notes regarding the training script
 1. The label column should contain "ham" for non-spam messages and "spam" for spam messages. you may add other columns aside from the label and messages column but those would be ignored
 2. The optional commands are
@@ -148,7 +151,7 @@ docker run -it --rm -p 9696:9696 -e RUN_ID=<run id in mlflow> -e TRACKING_URI=<t
 
 for a local run, add ```--add-host=host.docker.internal:host-gateway``` and use "http://host.docker.internal:5001" for the tracking uri. this will connect to the mlflow setup running 
 ```
-docker run -it --rm -p 9696:9696 -e RUN_ID=54cb231fe90b4b0baaa7e36b6a5a937d -e TRACKING_URI="http://host.docker.internal:5001" --add-host=host.docker.internal:host-gateway spam-prediction-service-mlflow:v1
+docker run -it --rm -p 9696:9696 -e RUN_ID=76f54d380923465d8c7dc541df5131c9 -e TRACKING_URI="http://host.docker.internal:5001" --add-host=host.docker.internal:host-gateway spam-prediction-service-mlflow:v1
 ```
 
 to test that the blackbox container running locally can connect to your mlflow setup that's also running locally, run the following in the container
