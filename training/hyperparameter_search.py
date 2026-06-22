@@ -1,10 +1,10 @@
 
+import mlflow
 import lightning as L
-
+from lightning.pytorch.loggers import MLFlowLogger
 
 from spam_checker.data.spam_lit_datamodule import SMSDataModule
 from spam_checker.models.spam_classifier import SpamClassifier
-import training.metadata.tuning as tuning_metadata
 
 def objective(trial, dataframe, args):
 
@@ -76,9 +76,41 @@ def objective(trial, dataframe, args):
         print("calling distributed processing")
         strategy = "deepspeed"
 
+    # Create one MLflow run per trial
+    mlflow_logger = None
+
+    if args.mlflow_tracking_uri:
+        if (len(args.mlflow_tracking_uri)):
+            mlflow.pytorch.autolog()
+            mlflow.set_tracking_uri(args.mlflow_tracking_uri)
+
+            processing = "single"
+
+            if (args.distributed_processing):
+                processing = "distributed"
+
+            mlflow_logger = MLFlowLogger(
+                tracking_uri=args.mlflow_tracking_uri,  # Point to your local or remote server
+                tags={"processing": processing},
+                experiment_name="spam_classifier_optuna",
+                run_name=f"trial_{trial.number}",
+                log_model='all',
+            )
+
+            mlflow_logger.log_hyperparams({
+                "trial_number": trial.number,
+                "batch_size": batch_size,
+                "embedding_dim": embedding_dim,
+                "hidden_dim": hidden_dim,
+                "lr": lr,
+                "max_vocab_size": max_vocab_size,
+                "max_length": max_length,
+            })
+
     trainer = L.Trainer(
         max_epochs=10,
-        logger=False,
+        # logger=False,
+        logger=mlflow_logger,
         enable_checkpointing=False,
         enable_progress_bar=False,
         accelerator=accelerator,
