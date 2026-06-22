@@ -56,6 +56,46 @@ def _setup_parser():
     )
 
     parser.add_argument(
+        "--max_length",
+        type=int,
+        default=50,
+        help="Max token length used in the vocab"
+        + " Default is 50.",
+    )
+
+    parser.add_argument(
+        "--max_vocab_size",
+        type=int,
+        default=5000,
+        help="Max size of the vocab"
+        + " Default is 5000.",
+    )
+
+    parser.add_argument(
+        "--embedding_dim",
+        type=int,
+        default=64,
+        help="Size of embedding dimension"
+        + " Default is 64.",
+    )
+
+    parser.add_argument(
+        "--hidden_dim",
+        type=int,
+        default=64,
+        help="Size of hidden dimension"
+        + " Default is 64.",
+    )
+
+    parser.add_argument(
+        "--lr",
+        type=float,
+        default=1e-3,
+        help="learning rate"
+        + " Default is 1e-3.",
+    )
+
+    parser.add_argument(
         "--max_epochs",
         type=int,
         default=2,
@@ -126,7 +166,7 @@ def _setup_parser():
     parser.add_argument(
         "--n_trials",
         type=int,
-        choices=range(5, 10), 
+        choices=range(5, 11), 
         default=5
     )
 

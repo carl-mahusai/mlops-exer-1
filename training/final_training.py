@@ -84,15 +84,7 @@ early_stop_acc = EarlyStopping(
 
 def train_model(
     args,
-    df, 
-    # best={        
-    #     "embedding_dim": 64,
-    #     "hidden_dim": 64,
-    #     "lr": 1e-3,
-    #     "max_length": 50,
-    #     "max_vocab_size": 5000,
-    #     "batch_size": 16
-    # },
+    df,
     best = tuning_metadata.BASE_PARAMETERS,
     tuned=False
 ):
@@ -133,9 +125,20 @@ def train_model(
         num_workers = 0
 
         batch_size = args.batch_size
+        max_length = args.max_length
+        max_vocab_size = args.max_vocab_size
+        embedding_dim = args.embedding_dim
+        hidden_dim = args.hidden_dim
+        hidden_dim = args.hidden_dim
+        lr = args.lr
 
         if tuned:
             batch_size = best["batch_size"]
+            max_length = best["max_length"]
+            max_vocab_size = best["max_vocab_size"]
+            embedding_dim = best["embedding_dim"]
+            hidden_dim = best["hidden_dim"]
+            lr = best["lr"]
 
 
         max_epochs = args.max_epochs
@@ -150,8 +153,8 @@ def train_model(
             dataframe=df,
             batch_size=batch_size,
             num_workers=num_workers,
-            max_length=best["max_length"],
-            max_vocab_size=best["max_vocab_size"]
+            max_length=max_length,
+            max_vocab_size=max_vocab_size
         )
 
 
@@ -162,9 +165,9 @@ def train_model(
         model = SpamClassifier(
             vocab_size=len(data.vocab),
             # **best
-            embedding_dim=best["embedding_dim"],
-            hidden_dim=best["hidden_dim"],
-            lr=best["lr"]
+            embedding_dim=embedding_dim,
+            hidden_dim=hidden_dim,
+            lr=lr
         )
 
         print("<------------------------model load complete-------------------------------->")

@@ -122,7 +122,29 @@ sudo apt install nvidia-cuda-toolkit
 
 tried using ddp for the training but that was causing very frequent crashes. ```fsdp``` sometimes crashes as well but not as frequently as ```ddp```. ```deepspeed``` was a very consistent performer which is why i used this more.
 
+the training script also has a hyperparameter optimization setup. it has two modes. the first one is triggered by the argument ```---optimize```. this just runs the hyperparameter optimization and returns a dictionary of the hyperparameters for training and data module setup. something like this
 
+```
+python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_column='v1' --name_of_message_column='v2' --mlflow_tracking_uri='http://127.0.0.1:5001' --max_epoch=20 --accelerator="gpu" --devices=1 --distributed_processing --optimize
+```
+
+it would print something like this
+```
+{
+  'batch_size': 32,
+  'embedding_dim': 64,
+  'hidden_dim': 128, 
+  'lr': 0.003381686749903336, 
+  'max_vocab_size': 5000, 
+  'max_length': 34
+}
+```
+
+the other option is ```--optimize_and_train```. this will run hyperparameter tuning and right after, run the final training with the optimized hyperparameters
+
+```
+python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_column='v1' --name_of_message_column='v2' --mlflow_tracking_uri='http://127.0.0.1:5001' --max_epoch=20 --accelerator="gpu" --devices=1 --distributed_processing --optimize_and_train
+```
 
 
 Notes regarding the training script
