@@ -54,16 +54,16 @@ class LogArtifactsCallback(Callback):
             if not os.path.isdir(folder_path):
                 os.makedirs(folder_path)
 
-                if os.path.isdir(folder_path):
+            if os.path.isdir(folder_path):
 
-                    print("calling on save artifacts")
+                print("calling on save artifacts")
 
-                    log_artifacts_manual(
-                        mlflow_client=mlflow_client,
-                        run_id=run_id,
-                        folder_path=folder_path,
-                        trainer=trainer
-                    )
+                log_artifacts_manual(
+                    mlflow_client=mlflow_client,
+                    run_id=run_id,
+                    folder_path=folder_path,
+                    trainer=trainer
+                )
 
                     
 
