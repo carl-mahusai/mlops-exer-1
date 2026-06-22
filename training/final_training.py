@@ -88,7 +88,11 @@ def train_model(
         "embedding_dim": 64,
         "hidden_dim": 64,
         "lr": 1e-3,
-    }
+        "max_length": 50,
+        "max_vocab_size": 5000,
+        "batch_size": 16
+    },
+    tuned=False
 ):
     multiprocessing.set_start_method("spawn", force=True)
     mlflow_logger = None
@@ -115,6 +119,8 @@ def train_model(
 
     # print(callbacks)
 
+    # {'batch_size': 16, 'embedding_dim': 32, 'hidden_dim': 256, 'lr': 0.000585829304703927, 'max_vocab_size': 5000, 'max_length': 57}
+
 
     if (not df.empty):
 
@@ -125,6 +131,11 @@ def train_model(
         num_workers = 0
 
         batch_size = args.batch_size
+
+        if tuned:
+            batch_size = best["batch_size"]
+
+
         max_epochs = args.max_epochs
         accelerator = args.accelerator
         devices = args.devices
@@ -136,7 +147,9 @@ def train_model(
         data = SMSDataModule(
             dataframe=df,
             batch_size=batch_size,
-            num_workers=num_workers
+            num_workers=num_workers,
+            max_length=best["max_length"],
+            max_vocab_size=best["max_vocab_size"]
         )
 
 
@@ -146,7 +159,10 @@ def train_model(
 
         model = SpamClassifier(
             vocab_size=len(data.vocab),
-            **best
+            # **best
+            embedding_dim=best["embedding_dim"],
+            hidden_dim=best["hidden_dim"],
+            lr=best["lr"]
         )
 
         print("<------------------------model load complete-------------------------------->")

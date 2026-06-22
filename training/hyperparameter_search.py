@@ -6,7 +6,7 @@ from spam_checker.data.spam_lit_datamodule import SMSDataModule
 from spam_checker.models.spam_classifier import SpamClassifier
 
 
-def objective(trial, dataframe):
+def objective(trial, dataframe, args):
 
     print("checking for hyperparameters")
 

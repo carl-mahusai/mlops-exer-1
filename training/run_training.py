@@ -50,9 +50,9 @@ def _setup_parser():
     parser.add_argument(
         "--batch_size",
         type=int,
-        default=8,
+        default=16,
         help="Batch size for data module"
-        + " Default is 8.",
+        + " Default is 16.",
     )
 
     parser.add_argument(
@@ -126,7 +126,8 @@ def _setup_parser():
     parser.add_argument(
         "--n-trials",
         type=int,
-        default=20
+        choices=range(5, 10), 
+        default=5
     )
 
     return parser
@@ -162,7 +163,12 @@ def main():
         "embedding_dim": 64,
         "hidden_dim": 64,
         "lr": 1e-3,
+        "max_length": 50,
+        "max_vocab_size": 5000,
+        "batch_size": 16
     }
+
+    tuned = False
 
     if (args.optimize_and_train or (args.optimize)):
         study = optuna.create_study(
@@ -170,19 +176,21 @@ def main():
         )
 
         study.optimize(
-            lambda trial: objective(trial, df),
+            lambda trial: objective(trial, df, args),
             n_trials=30
         )
 
         best = study.best_params
 
         print(best)
+        tuned = True
 
     if (args.optimize_and_train or (not args.optimize)):
         train_model(
             args=args,
             df=df,
-            best=best
+            best=best,
+            tuned=tuned
         )
 
 if __name__ == "__main__":
