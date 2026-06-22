@@ -2,6 +2,7 @@
 import argparse
 import pandas as pd
 import optuna
+import mlflow
 
 from training.final_training import train_model
 from training.hyperparameter_search import objective
@@ -135,7 +136,7 @@ def _setup_parser():
     parser.add_argument(
         "--mlflow_tracking_uri", 
         type=str,  # Passes the string path through your function
-        default="",
+        # default="",
         help="Tracking uri to be used by mlflow"
     )
 
@@ -214,12 +215,15 @@ def main():
 
     if (args.optimize_and_train or (args.optimize)):
         study = optuna.create_study(
-            direction="minimize"
+            direction="minimize",
+            # storage=args.mlflow_tracking_uri,
         )
-
+        mlflow.pytorch.autolog()
+        mlflow.set_tracking_uri(args.mlflow_tracking_uri)
         study.optimize(
             lambda trial: objective(trial, df, args),
-            n_trials=args.n_trials
+            n_trials=args.n_trials,
+            n_jobs=1
         )
 
         best = study.best_params

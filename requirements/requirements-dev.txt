@@ -8,3 +8,4 @@ psycopg2-binary==2.9.12
 deepspeed==0.19.2
 gradio==6.19.0
 optuna==4.9.0
+optuna-integration==4.9.0

@@ -3,6 +3,9 @@ import mlflow
 import lightning as L
 from lightning.pytorch.loggers import MLFlowLogger
 
+
+# from optuna_integration import PyTorchLightningPruningCallback
+
 from spam_checker.data.spam_lit_datamodule import SMSDataModule
 from spam_checker.models.spam_classifier import SpamClassifier
 
@@ -74,15 +77,19 @@ def objective(trial, dataframe, args):
     if (args.distributed_processing):
 
         print("calling distributed processing")
-        strategy = "deepspeed"
+        strategy = "ddp"
 
     # Create one MLflow run per trial
     mlflow_logger = None
-
+    # callbacks = [
+    #     PyTorchLightningPruningCallback(
+    #         trial,
+    #         monitor="val_loss"
+    #     )
+    # ]
     if args.mlflow_tracking_uri:
         if (len(args.mlflow_tracking_uri)):
-            mlflow.pytorch.autolog()
-            mlflow.set_tracking_uri(args.mlflow_tracking_uri)
+
 
             processing = "single"
 
