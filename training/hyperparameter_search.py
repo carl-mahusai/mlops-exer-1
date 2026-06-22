@@ -64,14 +64,39 @@ def objective(trial, dataframe, args):
         lr=lr
     )
 
+    accelerator = args.accelerator
+    devices = args.devices
+    # strategy_args = args.strategy
+    strategy = "auto"
+    num_nodes = args.num_nodes
+    devices = args.devices
+
+    if (args.distributed_processing):
+
+        print("calling distributed processing")
+        strategy = "deepspeed"
+
     trainer = L.Trainer(
         max_epochs=10,
         logger=False,
         enable_checkpointing=False,
         enable_progress_bar=False,
-        accelerator="auto",
-        devices=1
+        accelerator=accelerator,
+        devices=devices, 
+        # callbacks=callbacks,
+        strategy=strategy,
+        # num_nodes=num_nodes,
+        accumulate_grad_batches=4,
     )
+
+    # trainer = L.Trainer(
+    #     max_epochs=10,
+    #     logger=False,
+    #     enable_checkpointing=False,
+    #     enable_progress_bar=False,
+    #     accelerator="auto",
+    #     devices=1
+    # )
 
     trainer.fit(model, dm)
 

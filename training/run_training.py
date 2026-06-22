@@ -124,7 +124,7 @@ def _setup_parser():
 
 
     parser.add_argument(
-        "--n-trials",
+        "--n_trials",
         type=int,
         choices=range(5, 10), 
         default=5
@@ -179,7 +179,7 @@ def main():
 
         study.optimize(
             lambda trial: objective(trial, df, args),
-            n_trials=30
+            n_trials=args.n_trials
         )
 
         best = study.best_params
