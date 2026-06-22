@@ -33,26 +33,6 @@ class SMSDataModule(L.LightningDataModule):
         #     self.on_gpu = True
 
 
-    # def build_vocab(self, texts):
-    #     counter = Counter()
-
-    #     for text in texts:
-    #         counter.update(
-    #             str(text).lower().split()
-    #         )
-
-    #     vocab = {
-    #         "<PAD>": 0,
-    #         "<UNK>": 1,
-    #     }
-
-    #     for token, _ in counter.most_common(
-    #         self.max_vocab_size - 2
-    #     ):
-    #         vocab[token] = len(vocab)
-
-    #     return vocab
-
     def build_vocab(self, texts):
         return build_vocab_util(
             texts=texts,
