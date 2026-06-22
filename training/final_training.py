@@ -81,7 +81,15 @@ early_stop_acc = EarlyStopping(
     mode="max"
 )
 
-def train_model(args, df):
+def train_model(
+    args,
+    df, 
+    best={        
+        "embedding_dim": 64,
+        "hidden_dim": 64,
+        "lr": 1e-3,
+    }
+):
     multiprocessing.set_start_method("spawn", force=True)
     mlflow_logger = None
 
@@ -137,7 +145,8 @@ def train_model(args, df):
         print("<------------------------data load complete-------------------------------->")
 
         model = SpamClassifier(
-            vocab_size=len(data.vocab)
+            vocab_size=len(data.vocab),
+            **best
         )
 
         print("<------------------------model load complete-------------------------------->")

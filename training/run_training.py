@@ -115,6 +115,13 @@ def _setup_parser():
     )
 
     parser.add_argument(
+        "--optimize_and_train",
+        default=False,
+        action="store_true"
+    )
+
+
+    parser.add_argument(
         "--n-trials",
         type=int,
         default=20
@@ -149,10 +156,18 @@ def main():
             df = df.rename(columns={label_column: "label", message_column: "message"})
 
 
-    train_model(
-        args=args,
-        df=df
-    )
+    best={
+        "embedding_dim": 64,
+        "hidden_dim": 64,
+        "lr": 1e-3,
+    }
+
+    if (args.optimize_and_train or (not args.optimize)):
+        train_model(
+            args=args,
+            df=df,
+            best=best
+        )
 
 if __name__ == "__main__":
     main()
