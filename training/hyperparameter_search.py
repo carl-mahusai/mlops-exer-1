@@ -77,7 +77,7 @@ def objective(trial, dataframe, args):
     if (args.distributed_processing):
 
         print("calling distributed processing")
-        strategy = "ddp"
+        strategy = "deepspeed"
 
     # Create one MLflow run per trial
     mlflow_logger = None
