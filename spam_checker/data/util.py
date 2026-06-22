@@ -1,7 +1,7 @@
 import spacy
 from collections import Counter
 from collections import defaultdict
-
+from spam_checker.util import build_token_list
 
 
 # nlp = spacy.load("en_core_web_sm")
@@ -49,10 +49,12 @@ from collections import defaultdict
 
 def build_vocab_util(texts, max_vocab_size):
     counter = Counter()
-
+    # tokens = build_token_list(text)
     for text in texts:
         counter.update(
-            str(text).lower().split()
+            # str(text).lower().split()
+            # tokens
+            build_token_list(text)
         )
 
     vocab = {

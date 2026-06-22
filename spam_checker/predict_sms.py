@@ -1,5 +1,5 @@
 import torch
-
+from spam_checker.util import build_token_list
 
 def predict_sms(
     text,
@@ -8,8 +8,8 @@ def predict_sms(
     max_length=50,
 ):
     model.eval()
-
-    tokens = str(text).lower().split()
+    tokens = build_token_list(text)
+    # tokens = str(text).lower().split()
 
     ids = [
         vocab.get(token, vocab["<UNK>"])

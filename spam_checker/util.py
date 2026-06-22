@@ -1,6 +1,7 @@
 import contextlib
 import hashlib
 import os
+import re
 from pathlib import Path
 from typing import Union
 
@@ -46,3 +47,9 @@ def download_url(url, filename):
     """Download a file from url to filename, with a progress bar."""
     with TqdmUpTo(unit="B", unit_scale=True, unit_divisor=1024, miniters=1) as t:
         urlretrieve(url, filename, reporthook=t.update_to, data=None)  # noqa: S310
+
+def build_token_list(text):
+    # return str(text).lower().split()
+    text = str(text).lower()
+    text = re.sub(r"[^\w\s]", "", text)
+    return text.split()

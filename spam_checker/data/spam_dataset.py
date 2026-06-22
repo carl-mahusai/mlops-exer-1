@@ -4,6 +4,7 @@ from collections import Counter
 import re
 
 from spam_checker.data.util import build_vocab_util
+from spam_checker.util import build_token_list
 
 class SMSDataset(Dataset):
     # def __init__(self, data, vocab, max_length=50):
@@ -30,7 +31,8 @@ class SMSDataset(Dataset):
         )
 
     def encode(self, text):
-        tokens = str(text).lower().split()
+        tokens = build_token_list(text)
+        # tokens = str(text).lower().split()
 
         ids = [
             self.vocab.get(token, self.vocab["<UNK>"])

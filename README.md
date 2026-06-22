@@ -173,7 +173,7 @@ docker run -it --rm -p 9696:9696 -e RUN_ID=<run id in mlflow> -e TRACKING_URI=<t
 
 for a local run, add ```--add-host=host.docker.internal:host-gateway``` and use "http://host.docker.internal:5001" for the tracking uri. this will connect to the mlflow setup running 
 ```
-docker run -it --rm -p 9696:9696 -e RUN_ID=a834b7d3635343d8947ee8a165490042 -e TRACKING_URI="http://host.docker.internal:5001" --add-host=host.docker.internal:host-gateway spam-prediction-service-mlflow:v1
+docker run -it --rm -p 9696:9696 -e RUN_ID=790f3c6077de458a883665efad682e0f -e TRACKING_URI="http://host.docker.internal:5001" --add-host=host.docker.internal:host-gateway spam-prediction-service-mlflow:v1
 ```
 
 to test that the blackbox container running locally can connect to your mlflow setup that's also running locally, run the following in the container
