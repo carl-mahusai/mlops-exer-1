@@ -2,11 +2,13 @@
 import lightning as L
 
 
-from spam_checker.data.sms_data_module import SMSDataModule
-from spam_checker.model.spam_classifier import SpamClassifier
+from spam_checker.data.spam_lit_datamodule import SMSDataModule
+from spam_checker.models.spam_classifier import SpamClassifier
 
 
 def objective(trial, dataframe):
+
+    print("checking for hyperparameters")
 
     # Hyperparameters to optimize
     batch_size = trial.suggest_categorical(

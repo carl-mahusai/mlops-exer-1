@@ -1,8 +1,10 @@
 
 import argparse
 import pandas as pd
+import optuna
 
 from training.final_training import train_model
+from training.hyperparameter_search import objective
 
 
 def convert_to_df(file_path):
@@ -161,6 +163,20 @@ def main():
         "hidden_dim": 64,
         "lr": 1e-3,
     }
+
+    if (args.optimize_and_train or (args.optimize)):
+        study = optuna.create_study(
+            direction="minimize"
+        )
+
+        study.optimize(
+            lambda trial: objective(trial, df),
+            n_trials=30
+        )
+
+        best = study.best_params
+
+        print(best)
 
     if (args.optimize_and_train or (not args.optimize)):
         train_model(
