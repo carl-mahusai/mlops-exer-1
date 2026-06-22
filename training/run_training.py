@@ -213,13 +213,14 @@ def main():
 
     tuned = False
 
+    mlflow.pytorch.autolog()
+    mlflow.set_tracking_uri(args.mlflow_tracking_uri)
+
     if (args.optimize_and_train or (args.optimize)):
         study = optuna.create_study(
             direction="minimize",
             # storage=args.mlflow_tracking_uri,
         )
-        mlflow.pytorch.autolog()
-        mlflow.set_tracking_uri(args.mlflow_tracking_uri)
         study.optimize(
             lambda trial: objective(trial, df, args),
             n_trials=args.n_trials,

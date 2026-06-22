@@ -95,8 +95,8 @@ def train_model(
 
     if args.mlflow_tracking_uri:
         if (len(args.mlflow_tracking_uri)):
-            mlflow.pytorch.autolog()
-            mlflow.set_tracking_uri(args.mlflow_tracking_uri)
+            # mlflow.pytorch.autolog()
+            # mlflow.set_tracking_uri(args.mlflow_tracking_uri)
 
             processing = "single"
 
