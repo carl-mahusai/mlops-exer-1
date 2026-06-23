@@ -2,6 +2,7 @@ import pandas as pd
 
 from training.hyperparameter_search import hyperparameter_search
 from training.final_training import train_model
+from core.train import run_hyperparameter_search
 
 
 def run_training(args):
@@ -13,10 +14,12 @@ def run_training(args):
 
     if args.optimize_and_train:
 
-        best_params = hyperparameter_search(
-            dataframe=dataframe,
-            args=args
-        )
+        # best_params = hyperparameter_search(
+        #     dataframe=dataframe,
+        #     args=args
+        # )
+
+        best_params = run_hyperparameter_search(args)
 
         args.batch_size = best_params["batch_size"]
         args.embedding_dim = best_params["embedding_dim"]

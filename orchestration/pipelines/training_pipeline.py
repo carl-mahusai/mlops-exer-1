@@ -17,15 +17,15 @@ def training_pipeline(
 
         mlflow_tracking_uri: str = "",
 
-        max_epoch: int = 20,
+        max_epoch: int = 2,
 
-        accelerator: str = "cpu",
+        accelerator: str = "auto",
 
         devices: int = 1,
 
-        batch_size: int = 8,
+        batch_size: int = 16,
 
-        embedding_dim: int = 128,
+        embedding_dim: int = 64,
 
         hidden_dim: int = 64,
 
@@ -33,11 +33,11 @@ def training_pipeline(
 
         max_vocab_size: int = 5000,
 
-        max_length: int = 64,
+        max_length: int = 50,
 
         optimize_and_train: bool = False,
 
-        distributed_processing: bool = False,
+        # distributed_processing: bool = False,
 
         num_nodes: int = 1,
 
@@ -59,7 +59,7 @@ def training_pipeline(
         max_vocab_size=max_vocab_size,
         max_length=max_length,
         optimize_and_train=optimize_and_train,
-        distributed_processing=distributed_processing,
+        # distributed_processing=distributed_processing,
         num_nodes=num_nodes,
         n_trials=n_trials
     )
