@@ -133,13 +133,18 @@ python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_c
 it would print something like this
 ```
 {
-  'batch_size': 32,
-  'embedding_dim': 64,
+  'batch_size': 16, 
+  'embedding_dim': 32, 
   'hidden_dim': 128, 
-  'lr': 0.003381686749903336, 
+  'lr': 0.0034370889603316875, 
   'max_vocab_size': 5000, 
-  'max_length': 34
+  'max_length': 82
 }
+```
+you can then call training with these hyperparameters like this
+
+```
+python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_column='v1' --name_of_message_column='v2' --mlflow_tracking_uri='http://127.0.0.1:5001' --max_epoch=20 --accelerator="gpu" --devices=1 --batch_size=16 --embedding_dim=32 --hidden_dim=128 --lr=0.0034370889603316875 --max_vocab_size=5000 --max_length=82
 ```
 
 the other option is ```--optimize_and_train```. this will run hyperparameter tuning and right after, run the final training with the optimized hyperparameters
