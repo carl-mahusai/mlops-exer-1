@@ -7,9 +7,9 @@ from training.hyperparameter_search import (
 )
 
 
-def run_hyperparameter_search(args):
+def run_hyperparameter_search(args, dataframe):
 
-    dataframe = pd.read_csv(args.data)
+    # dataframe = pd.read_csv(args.data)
 
     if dataframe.empty:
         raise ValueError("Dataframe is empty")

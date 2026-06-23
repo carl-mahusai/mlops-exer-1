@@ -2,12 +2,14 @@ import pandas as pd
 
 from training.hyperparameter_search import hyperparameter_search
 from training.final_training import train_model
-from core.train import run_hyperparameter_search
+from core.tune import run_hyperparameter_search
+from core.data import read_df
 
 
 def run_training(args):
 
-    dataframe = pd.read_csv(args.data)
+    # dataframe = pd.read_csv(args.data)
+    dataframe = read_df(args)
 
     if dataframe.empty:
         raise ValueError("Dataframe is empty")
@@ -19,7 +21,7 @@ def run_training(args):
         #     args=args
         # )
 
-        best_params = run_hyperparameter_search(args)
+        best_params = run_hyperparameter_search(args, dataframe)
 
         args.batch_size = best_params["batch_size"]
         args.embedding_dim = best_params["embedding_dim"]

@@ -281,7 +281,7 @@ def build_trainer(
     strategy = "deepspeed"
 
     return Trainer(
-        max_epochs=args.max_epochs,
+        max_epochs=args.max_epoch,
         accelerator=args.accelerator,
         devices=args.devices,
         logger=logger,
