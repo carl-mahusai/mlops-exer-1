@@ -82,136 +82,243 @@ early_stop_acc = EarlyStopping(
     mode="max"
 )
 
-def train_model(
-    args,
-    df,
-    best = tuning_metadata.BASE_PARAMETERS,
-    tuned=False
-):
-    multiprocessing.set_start_method("spawn", force=True)
-    mlflow_logger = None
+# def train_model(
+#     args,
+#     df,
+#     best = tuning_metadata.BASE_PARAMETERS,
+#     tuned=False
+# ):
+#     multiprocessing.set_start_method("spawn", force=True)
+#     mlflow_logger = None
+
+#     callbacks = [early_stop_loss]
+
+#     if args.mlflow_tracking_uri:
+#         if (len(args.mlflow_tracking_uri)):
+#             # mlflow.pytorch.autolog()
+#             # mlflow.set_tracking_uri(args.mlflow_tracking_uri)
+
+#             # processing = "single"
+
+#             # if (args.distributed_processing):
+#             #     processing = "distributed"
+
+#             processing = "distributed"
+
+#             mlflow_logger = MLFlowLogger(
+#                 experiment_name="spam_training",
+#                 tracking_uri=args.mlflow_tracking_uri,  # Point to your local or remote server
+#                 # log_model='all',
+#                 log_model='False',
+#                 tags={"processing": processing}
+#             )
+#             callbacks.append(LogArtifactsCallback())
+
+#     # print(callbacks)
+
+#     # {'batch_size': 16, 'embedding_dim': 32, 'hidden_dim': 256, 'lr': 0.000585829304703927, 'max_vocab_size': 5000, 'max_length': 57}
+
+
+#     if (not df.empty):
+
+#         # print(df)
+
+#         # num_workers = args.num_workers
+
+#         num_workers = 0
+
+#         batch_size = args.batch_size
+#         max_length = args.max_length
+#         max_vocab_size = args.max_vocab_size
+#         embedding_dim = args.embedding_dim
+#         hidden_dim = args.hidden_dim
+#         hidden_dim = args.hidden_dim
+#         lr = args.lr
+
+#         if tuned:
+#             batch_size = best["batch_size"]
+#             max_length = best["max_length"]
+#             max_vocab_size = best["max_vocab_size"]
+#             embedding_dim = best["embedding_dim"]
+#             hidden_dim = best["hidden_dim"]
+#             lr = best["lr"]
+
+
+#         max_epochs = args.max_epochs
+#         accelerator = args.accelerator
+#         devices = args.devices
+#         # strategy_args = args.strategy
+#         strategy = "auto"
+#         num_nodes = args.num_nodes
+#         devices = args.devices
+
+#         data = SMSDataModule(
+#             dataframe=df,
+#             batch_size=batch_size,
+#             num_workers=num_workers,
+#             max_length=max_length,
+#             max_vocab_size=max_vocab_size
+#         )
+
+
+#         data.setup()
+
+#         print("<------------------------data load complete-------------------------------->")
+
+#         model = SpamClassifier(
+#             vocab_size=len(data.vocab),
+#             # **best
+#             embedding_dim=embedding_dim,
+#             hidden_dim=hidden_dim,
+#             lr=lr
+#         )
+
+#         print("<------------------------model load complete-------------------------------->")
+
+#         gpus = int(torch.cuda.is_available())
+
+#         # if (args.distributed_processing):
+
+#         #     print("calling distributed processing")
+#         #     strategy = "deepspeed"
+
+#         strategy = "deepspeed"
+
+#         trainer = Trainer(
+#             max_epochs=max_epochs,
+#             accelerator=accelerator,
+#             devices=devices, 
+#             logger=mlflow_logger,
+#             callbacks=callbacks,
+#             strategy=strategy,
+#             num_nodes=num_nodes,
+#             accumulate_grad_batches=4,
+#         )
+#         print("<------------------------trainer build complete-------------------------------->")
+
+#         trainer.fit(
+#             model,
+#             datamodule=data,
+#         )
+
+#         print("<------------------------trainer fit complete-------------------------------->")
+
+#         trainer.test(
+#             model,
+#             datamodule=data,
+#         )
+
+#         print("<------------------------trainer test complete-------------------------------->")
+
+#         has_log_callback = any(isinstance(item, LogArtifactsCallback) for item in callbacks)
+
+#         if (not has_log_callback):
+#             torch.save(data.vocab, "vocab.pt")
+#             trainer.save_checkpoint("sms_spam.ckpt")
+
+def build_logger(args):
+
+    if not args.mlflow_tracking_uri:
+        return None
+
+    # processing = "single"
+
+    # if (args.distributed_processing):
+    #     processing = "distributed"
+
+    processing = "distributed"
+
+    return MLFlowLogger(
+        experiment_name="spam_training",
+        tracking_uri=args.mlflow_tracking_uri,
+        log_model=False,
+         tags={"processing": processing}
+    )
+
+def build_callbacks(logger):
 
     callbacks = [early_stop_loss]
 
-    if args.mlflow_tracking_uri:
-        if (len(args.mlflow_tracking_uri)):
-            # mlflow.pytorch.autolog()
-            # mlflow.set_tracking_uri(args.mlflow_tracking_uri)
+    if logger:
+        callbacks.append(LogArtifactsCallback())
 
-            # processing = "single"
+    return callbacks
 
-            # if (args.distributed_processing):
-            #     processing = "distributed"
+def build_datamodule(args, dataframe):
 
-            processing = "distributed"
+    dm = SMSDataModule(
+        dataframe=dataframe,
+        batch_size=args.batch_size,
+        num_workers=0,
+        max_length=args.max_length,
+        max_vocab_size=args.max_vocab_size
+    )
 
-            mlflow_logger = MLFlowLogger(
-                experiment_name="spam_training",
-                tracking_uri=args.mlflow_tracking_uri,  # Point to your local or remote server
-                # log_model='all',
-                log_model='False',
-                tags={"processing": processing}
-            )
-            callbacks.append(LogArtifactsCallback())
+    dm.setup()
 
-    # print(callbacks)
+    return dm
 
-    # {'batch_size': 16, 'embedding_dim': 32, 'hidden_dim': 256, 'lr': 0.000585829304703927, 'max_vocab_size': 5000, 'max_length': 57}
+def build_model(args, vocab_size):
 
+    return SpamClassifier(
+        vocab_size=vocab_size,
+        embedding_dim=args.embedding_dim,
+        hidden_dim=args.hidden_dim,
+        lr=args.lr
+    )
 
-    if (not df.empty):
+def build_trainer(
+        args,
+        logger,
+        callbacks
+):
 
-        # print(df)
+    # strategy = "auto"
 
-        # num_workers = args.num_workers
+    # if args.distributed_processing:
+    #     strategy = "deepspeed"
 
-        num_workers = 0
+    strategy = "deepspeed"
 
-        batch_size = args.batch_size
-        max_length = args.max_length
-        max_vocab_size = args.max_vocab_size
-        embedding_dim = args.embedding_dim
-        hidden_dim = args.hidden_dim
-        hidden_dim = args.hidden_dim
-        lr = args.lr
+    return Trainer(
+        max_epochs=args.max_epoch,
+        accelerator=args.accelerator,
+        devices=args.devices,
+        logger=logger,
+        callbacks=callbacks,
+        strategy=strategy,
+        num_nodes=args.num_nodes,
+        accumulate_grad_batches=4
+    )
 
-        if tuned:
-            batch_size = best["batch_size"]
-            max_length = best["max_length"]
-            max_vocab_size = best["max_vocab_size"]
-            embedding_dim = best["embedding_dim"]
-            hidden_dim = best["hidden_dim"]
-            lr = best["lr"]
+def train_model(args, dataframe):
 
+    logger = build_logger(args)
 
-        max_epochs = args.max_epochs
-        accelerator = args.accelerator
-        devices = args.devices
-        # strategy_args = args.strategy
-        strategy = "auto"
-        num_nodes = args.num_nodes
-        devices = args.devices
+    callbacks = build_callbacks(logger)
 
-        data = SMSDataModule(
-            dataframe=df,
-            batch_size=batch_size,
-            num_workers=num_workers,
-            max_length=max_length,
-            max_vocab_size=max_vocab_size
-        )
+    dm = build_datamodule(
+        args=args,
+        dataframe=dataframe
+    )
 
+    model = build_model(
+        args=args,
+        vocab_size=len(dm.vocab)
+    )
 
-        data.setup()
+    trainer = build_trainer(
+        args=args,
+        logger=logger,
+        callbacks=callbacks
+    )
 
-        print("<------------------------data load complete-------------------------------->")
+    trainer.fit(
+        model,
+        datamodule=dm
+    )
 
-        model = SpamClassifier(
-            vocab_size=len(data.vocab),
-            # **best
-            embedding_dim=embedding_dim,
-            hidden_dim=hidden_dim,
-            lr=lr
-        )
-
-        print("<------------------------model load complete-------------------------------->")
-
-        gpus = int(torch.cuda.is_available())
-
-        # if (args.distributed_processing):
-
-        #     print("calling distributed processing")
-        #     strategy = "deepspeed"
-
-        strategy = "deepspeed"
-
-        trainer = Trainer(
-            max_epochs=max_epochs,
-            accelerator=accelerator,
-            devices=devices, 
-            logger=mlflow_logger,
-            callbacks=callbacks,
-            strategy=strategy,
-            num_nodes=num_nodes,
-            accumulate_grad_batches=4,
-        )
-        print("<------------------------trainer build complete-------------------------------->")
-
-        trainer.fit(
-            model,
-            datamodule=data,
-        )
-
-        print("<------------------------trainer fit complete-------------------------------->")
-
-        trainer.test(
-            model,
-            datamodule=data,
-        )
-
-        print("<------------------------trainer test complete-------------------------------->")
-
-        has_log_callback = any(isinstance(item, LogArtifactsCallback) for item in callbacks)
-
-        if (not has_log_callback):
-            torch.save(data.vocab, "vocab.pt")
-            trainer.save_checkpoint("sms_spam.ckpt")
+    trainer.test(
+        model,
+        datamodule=dm
+    )

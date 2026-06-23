@@ -1,5 +1,6 @@
 
 import mlflow
+import optuna
 import lightning as L
 from lightning.pytorch.loggers import MLFlowLogger
 
@@ -82,7 +83,7 @@ def objective(trial, dataframe, args):
     strategy = "deepspeed"
 
     # Create one MLflow run per trial
-    mlflow_logger = None
+    mlflow_logger = False
     # callbacks = [
     #     PyTorchLightningPruningCallback(
     #         trial,
@@ -146,3 +147,27 @@ def objective(trial, dataframe, args):
     val_loss = trainer.callback_metrics["val_loss"].item()
 
     return val_loss
+
+def hyperparameter_search(
+        dataframe,
+        args
+):
+
+    study = optuna.create_study(
+        direction="maximize"
+    )
+
+    study.optimize(
+        lambda trial:
+            objective(
+                trial=trial,
+                dataframe=dataframe,
+                args=args
+            ),
+        n_trials=args.n_trials
+    )
+
+    print("Best parameters:")
+    print(study.best_params)
+
+    return study.best_params

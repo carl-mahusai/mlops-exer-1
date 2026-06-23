@@ -10,3 +10,8 @@ mlflow.db
 **.pt
 training_run/
 .gradio
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd

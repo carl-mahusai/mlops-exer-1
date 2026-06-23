@@ -124,10 +124,10 @@ python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_c
 
 I tried using ddp for the training but that was causing very frequent crashes. ```fsdp``` sometimes crashes as well but not as frequently as ```ddp```. ```deepspeed``` was a very consistent performer which is why i used it.
 
-the training script also has a hyperparameter optimization setup. it has two modes. the first one is triggered by the argument ```---optimize```. this just runs the hyperparameter optimization and returns a dictionary of the hyperparameters for training and data module setup. something like this
+the training script also has a hyperparameter optimization setup. it has two modes. the first one is triggered by calling the ```training.run_optimization``` module. the hyperparameter optimization returns a dictionary of the hyperparameters for training and data module setup. something like this
 
 ```
-python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_column='v1' --name_of_message_column='v2' --mlflow_tracking_uri='http://127.0.0.1:5001' --max_epoch=20 --accelerator="gpu" --devices=1 --optimize
+python -m training.run_optimization --data='test_dataset/spam.csv' --name_of_label_column='v1' --name_of_message_column='v2' --mlflow_tracking_uri='http://127.0.0.1:5001' --max_epoch=20 --accelerator="gpu" --devices=1
 ```
 
 it would print something like this
@@ -164,7 +164,7 @@ or
 python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_column='v1' --name_of_message_column='v2' --mlflow_tracking_uri='http://127.0.0.1:5001' --max_epoch=20 --accelerator="gpu" --devices=1 --batch_size=8 --embedding_dim=256 --hidden_dim=128 --lr=0.0001805834262638685 --max_vocab_size=5000 --max_length=58
 ```
 
-the other option is ```--optimize_and_train```. this will run hyperparameter tuning and right after, run the final training with the optimized hyperparameters
+the other option is calling the ```training.run_training``` module and adding the ```--optimize_and_train``` parameter. this will run hyperparameter tuning and right after, run the final training with the optimized hyperparameters
 
 ```
 python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_column='v1' --name_of_message_column='v2' --mlflow_tracking_uri='http://127.0.0.1:5001' --max_epoch=20 --accelerator="gpu" --devices=1 --optimize_and_train
@@ -175,7 +175,7 @@ Notes regarding the training script
 1. The label column should contain "ham" for non-spam messages and "spam" for spam messages. you may add other columns aside from the label and messages column but those would be ignored
 2. The optional commands are
    - --batch_size - default is 8
-   - --max_epochs - default is 2
+   - --max_epoch - default is 2
    - --num_nodes - number of separate machines to train on. default is 1
    - --devices - devices to use in each training node. default is "1"
 3. For the --batch_size argument, training uses gradient accumulation with a value of 4. so the effective batch size is ```--batch_size x 4```. So for the default value of 8, the effective batch size memory would be 8 while running a batch size of 32.
@@ -220,4 +220,24 @@ python deployment/gradio/interface.py --api-url=<prediction endpoint>
 for the local example, this would be
 ```
 python deployment/gradio/interface.py --api-url=http://localhost:9696/predict
+```
+
+if setting up via prefect, from the project root, run
+
+```
+prefect deployment build \
+    orchestration/pipelines/training_pipeline.py:training_pipeline \
+    -n spam-training
+```
+
+then call
+```
+prefect deployment run 'training-pipeline/spam-training' \
+    --param data='test_dataset/spam.csv' \
+    --param name_of_label_column='v1' \
+    --param name_of_message_column='v2' \
+    --param mlflow_tracking_uri='http://127.0.0.1:5001' \
+    --param max_epoch=20 \
+    --param accelerator='gpu' \
+    --param devices=1
 ```
