@@ -225,12 +225,11 @@ python deployment/gradio/interface.py --api-url=http://localhost:9696/predict
 if setting up via prefect, from the project root, run
 
 ```
-prefect deployment build \
-    orchestration/pipelines/training_pipeline.py:training_pipeline \
-    -n spam-training
+prefect deploy
 ```
 
-then call
+```prefect.yaml``` already contains the deployment setup. after running deploy, run
+
 ```
 prefect deployment run 'training-pipeline/spam-training' \
     --param data='test_dataset/spam.csv' \
