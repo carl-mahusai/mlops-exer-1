@@ -67,17 +67,50 @@ class SpamClassifier(L.LightningModule):
 
         # self.log("train_loss", loss, sync_dist=True)
         # self.log("train_acc", acc, sync_dist=True)
-        self.log("train_loss", loss)
-        self.log("train_acc", acc)
+        # self.log("train_loss", loss)
+        # self.log("train_acc", acc)
+
+        self.log(
+            "train_loss",
+            loss,
+            on_step=False,
+            on_epoch=True,
+            prog_bar=True,
+            sync_dist=True
+        )
+
+        self.log(
+            "train_acc",
+            acc,
+            on_step=False,
+            on_epoch=True,
+            prog_bar=True,
+            sync_dist=True
+        )
 
         return loss
 
     def validation_step(self, batch, batch_idx):
         loss, acc = self.shared_step(batch)
 
+        # self.log(
+        #     "val_loss",
+        #     loss,
+        #     prog_bar=True,
+        #     sync_dist=True
+        # )
+
+        # self.log(
+        #     "val_acc",
+        #     acc,
+        #     prog_bar=True,
+        #     sync_dist=True
+        # )
         self.log(
             "val_loss",
             loss,
+            on_step=False,
+            on_epoch=True,
             prog_bar=True,
             sync_dist=True
         )
@@ -85,15 +118,39 @@ class SpamClassifier(L.LightningModule):
         self.log(
             "val_acc",
             acc,
+            on_step=False,
+            on_epoch=True,
             prog_bar=True,
             sync_dist=True
         )
 
+        return loss
+
     def test_step(self, batch, batch_idx):
         loss, acc = self.shared_step(batch)
 
-        self.log("test_loss", loss, sync_dist=True)
-        self.log("test_acc", acc, sync_dist=True)
+        # self.log("test_loss", loss, sync_dist=True)
+        # self.log("test_acc", acc, sync_dist=True)
+
+        self.log(
+            "test_loss",
+            loss,
+            on_step=False,
+            on_epoch=True,
+            prog_bar=True,
+            sync_dist=True
+        )
+
+        self.log(
+            "test_acc",
+            acc,
+            on_step=False,
+            on_epoch=True,
+            prog_bar=True,
+            sync_dist=True
+        )
+
+        return loss
 
     def configure_optimizers(self):
         return torch.optim.Adam(

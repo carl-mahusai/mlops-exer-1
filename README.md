@@ -109,23 +109,25 @@ for example
 python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_column='v1' --name_of_message_column='v2' --mlflow_tracking_uri='http://127.0.0.1:5001'
 ```
 
-you can run with distributed processing by adding the ```--distributed_processing```
-```
-python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_column='v1' --name_of_message_column='v2' --mlflow_tracking_uri='http://127.0.0.1:5001' --max_epoch=5 --accelerator="gpu" --devices=1 --distributed_processing
-```
-
-distributed processing uses "deepspeed". for this, you would have to install the nvidia cuda tooklit to run the trainer
+training is set up for distributed processing via deepspeed. you would have to install the nvidia cuda tooklit to run the trainer
 ```
 sudo apt update
 sudo apt install nvidia-cuda-toolkit
 ```
 
-tried using ddp for the training but that was causing very frequent crashes. ```fsdp``` sometimes crashes as well but not as frequently as ```ddp```. ```deepspeed``` was a very consistent performer which is why i used this more.
+
+distributed processing works best when ```--accelerator``` is set to ```gpu```. also set the number of devices using ```--devices```
+
+```
+python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_column='v1' --name_of_message_column='v2' --mlflow_tracking_uri='http://127.0.0.1:5001' --max_epoch=5 --accelerator="gpu" --devices=1
+```
+
+I tried using ddp for the training but that was causing very frequent crashes. ```fsdp``` sometimes crashes as well but not as frequently as ```ddp```. ```deepspeed``` was a very consistent performer which is why i used it.
 
 the training script also has a hyperparameter optimization setup. it has two modes. the first one is triggered by the argument ```---optimize```. this just runs the hyperparameter optimization and returns a dictionary of the hyperparameters for training and data module setup. something like this
 
 ```
-python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_column='v1' --name_of_message_column='v2' --mlflow_tracking_uri='http://127.0.0.1:5001' --max_epoch=20 --accelerator="gpu" --devices=1 --distributed_processing --optimize
+python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_column='v1' --name_of_message_column='v2' --mlflow_tracking_uri='http://127.0.0.1:5001' --max_epoch=20 --accelerator="gpu" --devices=1 --optimize
 ```
 
 it would print something like this
@@ -143,7 +145,7 @@ it would print something like this
 the other option is ```--optimize_and_train```. this will run hyperparameter tuning and right after, run the final training with the optimized hyperparameters
 
 ```
-python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_column='v1' --name_of_message_column='v2' --mlflow_tracking_uri='http://127.0.0.1:5001' --max_epoch=20 --accelerator="gpu" --devices=1 --distributed_processing --optimize_and_train
+python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_column='v1' --name_of_message_column='v2' --mlflow_tracking_uri='http://127.0.0.1:5001' --max_epoch=20 --accelerator="gpu" --devices=1 --optimize_and_train
 ```
 
 
@@ -173,7 +175,7 @@ docker run -it --rm -p 9696:9696 -e RUN_ID=<run id in mlflow> -e TRACKING_URI=<t
 
 for a local run, add ```--add-host=host.docker.internal:host-gateway``` and use "http://host.docker.internal:5001" for the tracking uri. this will connect to the mlflow setup running 
 ```
-docker run -it --rm -p 9696:9696 -e RUN_ID=790f3c6077de458a883665efad682e0f -e TRACKING_URI="http://host.docker.internal:5001" --add-host=host.docker.internal:host-gateway spam-prediction-service-mlflow:v1
+docker run -it --rm -p 9696:9696 -e RUN_ID=3c1eb26fe19e4de7b182298765e38dab -e TRACKING_URI="http://host.docker.internal:5001" --add-host=host.docker.internal:host-gateway spam-prediction-service-mlflow:v1
 ```
 
 to test that the blackbox container running locally can connect to your mlflow setup that's also running locally, run the following in the container

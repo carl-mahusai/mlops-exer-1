@@ -74,10 +74,12 @@ def objective(trial, dataframe, args):
     num_nodes = args.num_nodes
     devices = args.devices
 
-    if (args.distributed_processing):
+    # if (args.distributed_processing):
 
-        print("calling distributed processing")
-        strategy = "deepspeed"
+    #     print("calling distributed processing")
+    #     strategy = "deepspeed"
+
+    strategy = "deepspeed"
 
     # Create one MLflow run per trial
     mlflow_logger = None
@@ -91,17 +93,19 @@ def objective(trial, dataframe, args):
         if (len(args.mlflow_tracking_uri)):
 
 
-            processing = "single"
+            # processing = "single"
 
-            if (args.distributed_processing):
-                processing = "distributed"
+            # if (args.distributed_processing):
+            #     processing = "distributed"
+
+            processing = "distributed"
 
             mlflow_logger = MLFlowLogger(
                 tracking_uri=args.mlflow_tracking_uri,  # Point to your local or remote server
                 tags={"processing": processing},
                 experiment_name="spam_classifier_optuna",
                 run_name=f"trial_{trial.number}",
-                log_model='all',
+                log_model=False,
             )
 
             mlflow_logger.log_hyperparams({
@@ -116,8 +120,8 @@ def objective(trial, dataframe, args):
 
     trainer = L.Trainer(
         max_epochs=10,
-        # logger=False,
-        logger=mlflow_logger,
+        logger=False,
+        # logger=mlflow_logger,
         enable_checkpointing=False,
         enable_progress_bar=False,
         accelerator=accelerator,

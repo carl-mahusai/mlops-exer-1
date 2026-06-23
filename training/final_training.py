@@ -98,10 +98,12 @@ def train_model(
             # mlflow.pytorch.autolog()
             # mlflow.set_tracking_uri(args.mlflow_tracking_uri)
 
-            processing = "single"
+            # processing = "single"
 
-            if (args.distributed_processing):
-                processing = "distributed"
+            # if (args.distributed_processing):
+            #     processing = "distributed"
+
+            processing = "distributed"
 
             mlflow_logger = MLFlowLogger(
                 experiment_name="spam_training",
@@ -174,10 +176,12 @@ def train_model(
 
         gpus = int(torch.cuda.is_available())
 
-        if (args.distributed_processing):
+        # if (args.distributed_processing):
 
-            print("calling distributed processing")
-            strategy = "deepspeed"
+        #     print("calling distributed processing")
+        #     strategy = "deepspeed"
+
+        strategy = "deepspeed"
 
         trainer = Trainer(
             max_epochs=max_epochs,

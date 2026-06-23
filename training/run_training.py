@@ -215,6 +215,7 @@ def main():
 
     mlflow.pytorch.autolog()
     mlflow.set_tracking_uri(args.mlflow_tracking_uri)
+    mlflow.system_metrics.disable_system_metrics_logging()
 
     if (args.optimize_and_train or (args.optimize)):
         study = optuna.create_study(
