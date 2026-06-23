@@ -240,7 +240,11 @@ prefect deployment run 'training-pipeline/spam-training' \
     --param accelerator='gpu' \
     --param devices=1
 ```
-prefect server start
+prefect server start in one window
+in anothher window, get the prefect api url and set it like this
 prefect config set PREFECT_API_URL=http://127.0.0.1:4200/api
+then run this
 prefect worker start --pool default-agent-pool
+run this in a third window
 prefect deploy
+in that same window, run the deployment
