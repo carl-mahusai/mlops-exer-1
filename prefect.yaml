@@ -17,17 +17,20 @@ push: null
 
 # pull section allows you to provide instructions for cloning
 # this project in remote locations
-pull:
-- prefect.deployments.steps.git_clone:
-    repository: git@carl-mahusai-ph.github.com:carl-mahusai/mlops-exer-1.git
-    branch: main
-    access_token: null
+# pull:
+# - prefect.deployments.steps.git_clone:
+#     repository: git@carl-mahusai-ph.github.com:carl-mahusai/mlops-exer-1.git
+#     branch: main
+#     access_token: null
+pull: null
 
 # the deployments section allows you to provide configuration
 # for deploying flows
+# this particular deployment is for a local run. this points to the current folder
 deployments:
 - name: spam-training
   entrypoint: orchestration/pipelines/training_pipeline.py:training_pipeline
   work_pool:
-    name: default-agent-pool
+    name: my-local-pool
+  path: .
 
