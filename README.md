@@ -232,7 +232,7 @@ prefect deploy
 
 ```
 prefect deployment run 'training-pipeline/spam-training' \
-    --param data='test_dataset/spam.csv' \
+    --param data='/mnt/c/Users/user/Documents/Projects/mlops-exer-1/test_dataset/spam.csv' \
     --param name_of_label_column='v1' \
     --param name_of_message_column='v2' \
     --param mlflow_tracking_uri='http://127.0.0.1:5001' \
