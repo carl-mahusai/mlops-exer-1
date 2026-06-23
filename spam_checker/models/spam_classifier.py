@@ -33,10 +33,27 @@ class SpamClassifier(L.LightningModule):
         )
 
     def forward(self, x):
-        x = self.embedding(x)
+        # x = self.embedding(x)
 
-        # Mean pooling
-        x = x.mean(dim=1)
+        # # Mean pooling
+        # x = x.mean(dim=1)
+
+        embeddings = self.embedding(x)
+
+        # Create mask: 1 for real tokens, 0 for PAD tokens
+        mask = (x != 0).unsqueeze(-1)
+
+        # Zero out PAD embeddings
+        embeddings = embeddings * mask
+
+        # Sum only real token embeddings
+        summed = embeddings.sum(dim=1)
+
+        # Count real tokens
+        lengths = mask.sum(dim=1).clamp(min=1)
+
+        # Compute mean over real tokens only
+        x = summed / lengths
 
         x = F.relu(self.fc1(x))
 
