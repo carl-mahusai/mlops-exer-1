@@ -175,7 +175,7 @@ Notes regarding the training script
 1. The label column should contain "ham" for non-spam messages and "spam" for spam messages. you may add other columns aside from the label and messages column but those would be ignored
 2. The optional commands are
    - --batch_size - default is 8
-   - --max_epochs - default is 2
+   - --max_epoch - default is 2
    - --num_nodes - number of separate machines to train on. default is 1
    - --devices - devices to use in each training node. default is "1"
 3. For the --batch_size argument, training uses gradient accumulation with a value of 4. so the effective batch size is ```--batch_size x 4```. So for the default value of 8, the effective batch size memory would be 8 while running a batch size of 32.
