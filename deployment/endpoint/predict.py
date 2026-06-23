@@ -163,7 +163,7 @@ app = Flask('spam-prediction')
 
 @app.route('/predict', methods=['POST'])
 def predict_endpoint():
-    text = request.get_json()
+    text = request.get_json().get("text")
 
     if (model_built):
         result = predict_sms(

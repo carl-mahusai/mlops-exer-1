@@ -120,8 +120,8 @@ def objective(trial, dataframe, args):
 
     trainer = L.Trainer(
         max_epochs=10,
-        logger=False,
-        # logger=mlflow_logger,
+        # logger=False,
+        logger=mlflow_logger,
         enable_checkpointing=False,
         enable_progress_bar=False,
         accelerator=accelerator,
