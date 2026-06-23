@@ -124,10 +124,10 @@ python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_c
 
 I tried using ddp for the training but that was causing very frequent crashes. ```fsdp``` sometimes crashes as well but not as frequently as ```ddp```. ```deepspeed``` was a very consistent performer which is why i used it.
 
-the training script also has a hyperparameter optimization setup. it has two modes. the first one is triggered by the argument ```---optimize```. this just runs the hyperparameter optimization and returns a dictionary of the hyperparameters for training and data module setup. something like this
+the training script also has a hyperparameter optimization setup. it has two modes. the first one is triggered by calling the ```training.run_optimization``` module. the hyperparameter optimization returns a dictionary of the hyperparameters for training and data module setup. something like this
 
 ```
-python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_column='v1' --name_of_message_column='v2' --mlflow_tracking_uri='http://127.0.0.1:5001' --max_epoch=20 --accelerator="gpu" --devices=1 --optimize
+python -m training.run_optimization --data='test_dataset/spam.csv' --name_of_label_column='v1' --name_of_message_column='v2' --mlflow_tracking_uri='http://127.0.0.1:5001' --max_epoch=20 --accelerator="gpu" --devices=1
 ```
 
 it would print something like this
@@ -164,7 +164,7 @@ or
 python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_column='v1' --name_of_message_column='v2' --mlflow_tracking_uri='http://127.0.0.1:5001' --max_epoch=20 --accelerator="gpu" --devices=1 --batch_size=8 --embedding_dim=256 --hidden_dim=128 --lr=0.0001805834262638685 --max_vocab_size=5000 --max_length=58
 ```
 
-the other option is ```--optimize_and_train```. this will run hyperparameter tuning and right after, run the final training with the optimized hyperparameters
+the other option is calling the ```training.run_training``` module and adding the ```--optimize_and_train``` parameter. this will run hyperparameter tuning and right after, run the final training with the optimized hyperparameters
 
 ```
 python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_column='v1' --name_of_message_column='v2' --mlflow_tracking_uri='http://127.0.0.1:5001' --max_epoch=20 --accelerator="gpu" --devices=1 --optimize_and_train
