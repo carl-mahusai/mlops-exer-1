@@ -2,13 +2,13 @@ from argparse import Namespace
 
 from prefect import flow
 
-from orchestration.tasks.training_tasks import (
-    run_training_task
+from orchestration.tasks.tuning_tasks import (
+    run_tuning_task
 )
 
 
 @flow
-def training_pipeline(
+def tuning_pipeline(
 
         data: str,
 
@@ -64,4 +64,4 @@ def training_pipeline(
         n_trials=n_trials
     )
 
-    run_training_task(args)
+    run_tuning_task(args)
