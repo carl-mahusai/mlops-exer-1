@@ -108,7 +108,8 @@ def train_model(
             mlflow_logger = MLFlowLogger(
                 experiment_name="spam_training",
                 tracking_uri=args.mlflow_tracking_uri,  # Point to your local or remote server
-                log_model='all',
+                # log_model='all',
+                log_model='False',
                 tags={"processing": processing}
             )
             callbacks.append(LogArtifactsCallback())

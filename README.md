@@ -141,10 +141,27 @@ it would print something like this
   'max_length': 82
 }
 ```
+
+or
+```
+{
+  'batch_size': 8, 
+  'embedding_dim': 256, 
+  'hidden_dim': 128, 
+  'lr': 0.0001805834262638685, 
+  'max_vocab_size': 5000, 
+  'max_length': 58
+}
+```
 you can then call training with these hyperparameters like this
 
 ```
 python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_column='v1' --name_of_message_column='v2' --mlflow_tracking_uri='http://127.0.0.1:5001' --max_epoch=20 --accelerator="gpu" --devices=1 --batch_size=16 --embedding_dim=32 --hidden_dim=128 --lr=0.0034370889603316875 --max_vocab_size=5000 --max_length=82
+```
+
+or
+```
+python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_column='v1' --name_of_message_column='v2' --mlflow_tracking_uri='http://127.0.0.1:5001' --max_epoch=20 --accelerator="gpu" --devices=1 --batch_size=8 --embedding_dim=256 --hidden_dim=128 --lr=0.0001805834262638685 --max_vocab_size=5000 --max_length=58
 ```
 
 the other option is ```--optimize_and_train```. this will run hyperparameter tuning and right after, run the final training with the optimized hyperparameters
