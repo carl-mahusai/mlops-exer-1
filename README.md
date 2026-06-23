@@ -221,3 +221,23 @@ for the local example, this would be
 ```
 python deployment/gradio/interface.py --api-url=http://localhost:9696/predict
 ```
+
+if setting up via prefect, from the project root, run
+
+```
+prefect deployment build \
+    orchestration/pipelines/training_pipeline.py:training_pipeline \
+    -n spam-training
+```
+
+then call
+```
+prefect deployment run 'training-pipeline/spam-training' \
+    --param data='test_dataset/spam.csv' \
+    --param name_of_label_column='v1' \
+    --param name_of_message_column='v2' \
+    --param mlflow_tracking_uri='http://127.0.0.1:5001' \
+    --param max_epoch=20 \
+    --param accelerator='gpu' \
+    --param devices=1
+```
