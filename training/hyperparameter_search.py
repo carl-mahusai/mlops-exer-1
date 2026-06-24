@@ -4,11 +4,32 @@ import optuna
 import lightning as L
 from lightning.pytorch.loggers import MLFlowLogger
 
+# from mlflow.utils.mlflow_tags import generate_run_name
 
 # from optuna_integration import PyTorchLightningPruningCallback
 
+import time
+
+
 from spam_checker.data.spam_lit_datamodule import SMSDataModule
 from spam_checker.models.spam_classifier import SpamClassifier
+
+import random
+
+adjectives = [
+    "charming", "brave", "silent", "quick", "bold",
+    "bright", "calm", "proud", "gentle", "lucky"
+]
+
+animals = [
+    "fox", "wolf", "eagle", "otter", "lion",
+    "tiger", "bear", "hawk", "deer", "lynx"
+]
+
+def generate_mlflow_like_name():
+    return f"{random.choice(adjectives)}-{random.choice(animals)}-{random.randint(10,99)}"
+
+# print(generate_mlflow_like_name())
 
 def objective(trial, dataframe, args):
 
@@ -101,11 +122,16 @@ def objective(trial, dataframe, args):
 
             processing = "distributed"
 
+            # name_prefix = generate_run_name()
+            # name_prefix = generate_mlflow_like_name()
+
+            name_prefix = time.time_ns()
+
             mlflow_logger = MLFlowLogger(
                 tracking_uri=args.mlflow_tracking_uri,  # Point to your local or remote server
                 tags={"processing": processing},
                 experiment_name="spam_classifier_optuna",
-                run_name=f"trial_{trial.number}",
+                run_name=f"{name_prefix}_trial_{trial.number}",
                 log_model=False,
             )
 

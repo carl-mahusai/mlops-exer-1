@@ -33,4 +33,10 @@ deployments:
   work_pool:
     name: my-local-pool
   path: .
+- name: spam-tuning
+  entrypoint: orchestration/pipelines/tuning_pipeline.py:tuning_pipeline
+  work_pool:
+    name: my-local-pool
+  path: .
+
 
