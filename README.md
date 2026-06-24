@@ -299,13 +299,14 @@ prefect deploy
 
 this will read the prefect.yaml file and setup the deployment
 select the deployment you want setup, it should look something like this
+```
 ┏━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃    ┃ Name          ┃ Entrypoint                                                     ┃ Description                    ┃
 ┡━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
 │ >  │ spam-training │ orchestration/pipelines/training_pipeline.py:training_pipeline │ None                           │
 │    │               │                                                                │ No, configure a new deployment │
 └────┴───────────────┴────────────────────────────────────────────────────────────────┴────────────────────────────────┘
-
+```
 
 I selected spam-training
 
@@ -369,6 +370,4 @@ it runs the exact same code as the command line version
 ```
 python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_column='v1' --name_of_message_column='v2' --mlflow_tracking_uri='http://127.0.0.1:5001' --max_epoch=20 --accelerator="gpu" --devices=1 --optimize_and_train --n_trials=5
 ```
-
-That said, upon further testing, running the optimize and train setup via prefect yields lower scores than running optimize and train via CLI. I'm not sure why because they run the exact same code.
 
