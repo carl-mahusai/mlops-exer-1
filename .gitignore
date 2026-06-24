@@ -1,6 +1,8 @@
 mlruns/
 artifacts/
-test_dataset/
+test_dataset/*
+!test_dataset/spam.csv
+!test_dataset/spam_sample.csv
 lightning_logs/
 
 **/data/downloaded/**

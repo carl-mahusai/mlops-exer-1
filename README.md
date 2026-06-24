@@ -1,6 +1,6 @@
 # mlops-exer-1
 
-Development
+**Development**
 1. Create your virtual environment. Note that this was made with Python 3.14.5
 
 2. Open your CLI and run
@@ -222,62 +222,65 @@ for the local example, this would be
 python deployment/gradio/interface.py --api-url=http://localhost:9696/predict
 ```
 
-if setting up via prefect, from the project root, run
+** Running in Prefect**
 
+1. setup the postgresql db to be used by prefect. setup the connection string to be used
 ```
-prefect deploy
-```
-
-```prefect.yaml``` already contains the deployment setup. after running deploy, run
-
-```
-prefect deployment run 'training-pipeline/spam-training' \
-    --param data='/mnt/c/Users/user/Documents/Projects/mlops-exer-1/test_dataset/spam.csv' \
-    --param name_of_label_column='v1' \
-    --param name_of_message_column='v2' \
-    --param mlflow_tracking_uri='http://127.0.0.1:5001' \
-    --param max_epoch=20 \
-    --param accelerator='gpu' \
-    --param devices=1
-```
-setup the postgresql db to be used by prefect. setup the connection string to be used
-
 postgresql+asyncpg://<username>:<password>@<host>:<port>/<database_name>
+```
 
 for my local setup, it would be like this
+```
 postgresql+asyncpg://prefect:vGJJx0Su@winhost:5432/prefect
+```
 
-set the api connection url. either via an exported variable like this
+2. set the api connection url. either via an exported variable like this
+```
 export PREFECT_API_DATABASE_CONNECTION_URL="postgresql+asyncpg://prefect:vGJJx0Su@winhost:5432/prefect"
-
+```
 or globally like this
+```
 prefect config set PREFECT_API_DATABASE_CONNECTION_URL="postgresql+asyncpg://prefect:vGJJx0Su@winhost:5432/prefect"
+```
+Note that you can use both. the default that will be used is the config but if you do the export, that will be the string used
 
-update also the privileges of the user for the db
+3. update also the privileges of the user for the db
+```
 GRANT ALL PRIVILEGES ON DATABASE database_name TO username;
 GRANT USAGE, CREATE ON SCHEMA public TO username;
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO username;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO username;
 ALTER DATABASE database_name OWNER TO username;
+```
 
-the run
+then run
+```
 prefect server database upgrade
-once that's done, run
-prefect server start
+```
 
+3. once that's done, run
+```
+prefect server start
+```
 you only have to setup the db once. you can just run prefect server start in one window for future runs
 
-in another window, get the prefect api url and set it like this
+4. in another window, get the prefect api url and set it like this
 prefect config set PREFECT_API_URL=http://127.0.0.1:4200/api
-then run this
+
+5. Run this to create your new process pool
+```
 prefect work-pool create my-local-pool --type process
+```
 
 this creates a process type prefect pool to be used by the deployment
 
-start this pool
+6. start this pool
+```
 prefect worker start --pool my-local-pool
+```
+no need to recreate the pool for future runs.
 
-run this in a third window
+7. run this in a third window
 prefect deploy
 
 this will read the prefect.yaml file and setup the deployment
@@ -290,32 +293,40 @@ select the deployment you want setup, it should look something like this
 └────┴───────────────┴────────────────────────────────────────────────────────────────┴────────────────────────────────┘
 
 
-i selected spam-training
+I selected spam-training
 
 prefect will ask if you want prefect to pull code. since this is a local run, select ```n```
-
+```
 ? Your Prefect workers will need access to this flow's code in order to run it. Would you like your workers to pull your
 flow code from a remote storage location when running this flow? [y/n] (y): n
-
+```
 it should display something like this
-
+```
 Your Prefect workers will attempt to load your flow from:
 /mnt/c/Users/user/Documents/Projects/mlops-exer-1/orchestration/pipelines/training_pipeline.py. To see more options for
 managing your flow's code, run:
 
         $ prefect init
+```
 
 as you can see, it's pointing to the current folder
 it will then ask this
+
+```
 Would you like to configure schedules for this deployment? [y/n] (y): n
+```
+since this is a local run and i can deploy anytime, select ```n```
 
-since this is a local run and i can deploy anytime, select n
+8. Run the following in your terminal for the worker
 
-once finished, in that same window, run the deployment
+prefect config set PREFECT_API_REQUEST_TIMEOUT=300
+prefect config set PREFECT_WORKER_HEARTBEAT_SECONDS=60
+
+9. once finished, in that same window, run the deployment. this example which uses ```spam_sample.csv``` uses a small sample for testing
 
 ```
 prefect deployment run 'training-pipeline/spam-training' \
-    --param data='/mnt/c/Users/user/Documents/Projects/mlops-exer-1/test_dataset/spam.csv' \
+    --param data='/mnt/c/Users/user/Documents/Projects/mlops-exer-1/test_dataset/spam_sample.csv' \
     --param name_of_label_column='v1' \
     --param name_of_message_column='v2' \
     --param mlflow_tracking_uri='http://127.0.0.1:5001' \
