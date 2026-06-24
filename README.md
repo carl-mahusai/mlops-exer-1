@@ -1,6 +1,19 @@
 # mlops-exer-1
 
 **Development**
+0. If like me and you're running everything in WSL, have to increase the RAM available to WSL otherwise it will crash. My wslconfig looks like this
+```
+[wsl2]
+memory=8GB   # Limits VM memory in WSL
+processors=4 # Makes the WSL 4 VM use two virtual processors
+swap=4GB
+kernelCommandLine=systemd.unified_cgroup_hierarchy=1
+
+[experimental]
+autoMemoryReclaim=gradual
+```
+This is on 16GB on RAM
+
 1. Create your virtual environment. Note that this was made with Python 3.14.5
 
 2. Open your CLI and run
@@ -223,18 +236,6 @@ python deployment/gradio/interface.py --api-url=http://localhost:9696/predict
 ```
 
 ** Running in Prefect**
-0. If like me and you're running everything in WSL, have to increase the RAM available to WSL otherwise it will crash. My wslconfig looks like this
-```
-[wsl2]
-memory=8GB   # Limits VM memory in WSL
-processors=4 # Makes the WSL 4 VM use two virtual processors
-swap=4GB
-kernelCommandLine=systemd.unified_cgroup_hierarchy=1
-
-[experimental]
-autoMemoryReclaim=gradual
-```
-
 1. setup the postgresql db to be used by prefect. setup the connection string to be used
 ```
 postgresql+asyncpg://<username>:<password>@<host>:<port>/<database_name>
