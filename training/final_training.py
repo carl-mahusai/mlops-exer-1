@@ -10,7 +10,7 @@ from lightning.pytorch.utilities.rank_zero import rank_zero_only
 from lightning.pytorch.strategies import FSDPStrategy, DeepSpeedStrategy
 from torch.distributed.fsdp import StateDictType
 
-import training.metadata.tuning as tuning_metadata
+import training.metadata.training as training_metadata
 from spam_checker.data.spam_lit_datamodule import SMSDataModule
 from spam_checker.models.spam_classifier import SpamClassifier
 
@@ -105,7 +105,8 @@ def build_logger(args):
     })
 
     mlflow_logger = MLFlowLogger(
-        experiment_name="spam_training",
+        # experiment_name="spam_training",
+        experiment_name=training_metadata.EXPERIMENT,
         tracking_uri=args.mlflow_tracking_uri,
         log_model=False,
         tags={
@@ -172,6 +173,26 @@ def build_trainer(
         accumulate_grad_batches=4
     )
 
+@rank_zero_only
+def log_dataset_lineage(logger, dataframe, args):
+    """
+    Logs dataset lineage information into the existing MLflow run.
+    """
+
+    run_id = logger.run_id
+
+    # mlflow.set_tracking_uri(args.mlflow_tracking_uri)
+    mlflow.set_experiment(training_metadata.EXPERIMENT)
+
+    dataset = mlflow.data.from_pandas(
+        df=dataframe,
+        source=args.data,
+        name="sms_dataset"
+    )
+
+    with mlflow.start_run(run_id=run_id):
+        mlflow.log_input(dataset, context="training")
+
 def train_model(args, dataframe):
 
     logger = build_logger(args)
@@ -191,12 +212,22 @@ def train_model(args, dataframe):
     #     with mlflow.start_run(run_id=run_id):
     #         mlflow.log_input(dataset, context="training")
 
+    # if logger:
+    #     run_id = logger.run_id
+    #     logger.experiment.log_param(run_id, "dataset_path", args.data)
+    #     logger.experiment.log_param(run_id, "dataset_rows", len(dataframe))
+    #     logger.experiment.log_param(run_id, "dataset_columns", len(dataframe.columns))
+    #     logger.experiment.log_param(run_id, "dataset_context", "training")
+
     if logger:
-        run_id = logger.run_id
-        logger.experiment.log_param(run_id, "dataset_path", args.data)
-        logger.experiment.log_param(run_id, "dataset_rows", len(dataframe))
-        logger.experiment.log_param(run_id, "dataset_columns", len(dataframe.columns))
-        logger.experiment.log_param(run_id, "dataset_context", "training")
+        _ = logger.experiment
+        _ = logger.run_id
+
+        log_dataset_lineage(
+            logger=logger,
+            dataframe=dataframe,
+            args=args
+        )
 
     callbacks = build_callbacks(logger)
 

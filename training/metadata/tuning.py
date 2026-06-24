@@ -6,3 +6,5 @@ BASE_PARAMETERS = {
     "max_vocab_size": 5000,
     "batch_size": 16
 }
+
+EXPERIMENT = "spam_classifier_optuna"

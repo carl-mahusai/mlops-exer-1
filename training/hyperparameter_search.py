@@ -1,6 +1,9 @@
 
 import mlflow
 import optuna
+import time
+import random
+
 import lightning as L
 from lightning.pytorch.loggers import MLFlowLogger
 
@@ -8,13 +11,14 @@ from lightning.pytorch.loggers import MLFlowLogger
 
 # from optuna_integration import PyTorchLightningPruningCallback
 
-import time
 
 
 from spam_checker.data.spam_lit_datamodule import SMSDataModule
 from spam_checker.models.spam_classifier import SpamClassifier
 
-import random
+import training.metadata.tuning as tuning_metadata
+
+
 
 adjectives = [
     "charming", "brave", "silent", "quick", "bold",
@@ -130,7 +134,8 @@ def objective(trial, dataframe, args, name_prefix):
             mlflow_logger = MLFlowLogger(
                 tracking_uri=args.mlflow_tracking_uri,  # Point to your local or remote server
                 tags={"processing": processing},
-                experiment_name="spam_classifier_optuna",
+                # experiment_name="spam_classifier_optuna",
+                experiment_name=tuning_metadata.EXPERIMENT,
                 run_name=f"{name_prefix}_trial_{trial.number}",
                 log_model=False,
             )
@@ -201,7 +206,9 @@ def hyperparameter_search(
     # Create a new MLflow run containing the study results
     if args.mlflow_tracking_uri:
         # mlflow.set_tracking_uri(args.mlflow_tracking_uri)
-        mlflow.set_experiment("spam_classifier_optuna")
+        
+        # mlflow.set_experiment("spam_classifier_optuna")
+        mlflow.set_experiment(tuning_metadata.EXPERIMENT)
 
         with mlflow.start_run(run_name=f"{name_prefix}_best_hyperparameters"):
             mlflow.log_params(study.best_params)
