@@ -31,7 +31,7 @@ def generate_mlflow_like_name():
 
 # print(generate_mlflow_like_name())
 
-def objective(trial, dataframe, args):
+def objective(trial, dataframe, args, name_prefix):
 
     print("checking for hyperparameters")
 
@@ -125,7 +125,7 @@ def objective(trial, dataframe, args):
             # name_prefix = generate_run_name()
             # name_prefix = generate_mlflow_like_name()
 
-            name_prefix = time.time_ns()
+            
 
             mlflow_logger = MLFlowLogger(
                 tracking_uri=args.mlflow_tracking_uri,  # Point to your local or remote server
@@ -180,20 +180,34 @@ def hyperparameter_search(
 ):
 
     study = optuna.create_study(
-        direction="maximize"
+        direction="minimize"
     )
+    name_prefix = time.time_ns()
 
     study.optimize(
         lambda trial:
             objective(
                 trial=trial,
                 dataframe=dataframe,
-                args=args
+                args=args,
+                name_prefix=name_prefix
             ),
         n_trials=args.n_trials
     )
 
     print("Best parameters:")
     print(study.best_params)
+
+    # Create a new MLflow run containing the study results
+    if args.mlflow_tracking_uri:
+        # mlflow.set_tracking_uri(args.mlflow_tracking_uri)
+        mlflow.set_experiment("spam_classifier_optuna")
+
+        with mlflow.start_run(run_name=f"{name_prefix}_best_hyperparameters"):
+            mlflow.log_params(study.best_params)
+
+            # Optional additional information
+            mlflow.log_metric("best_value", study.best_value)
+            mlflow.log_param("best_trial_number", study.best_trial.number)
 
     return study.best_params

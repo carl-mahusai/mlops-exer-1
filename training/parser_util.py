@@ -120,7 +120,7 @@ def _setup_parser():
         "--n_trials",
         type=int,
         choices=range(1, 11), 
-        default=1
+        default=5
     )
 
     return parser

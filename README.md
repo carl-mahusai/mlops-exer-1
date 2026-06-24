@@ -347,7 +347,8 @@ prefect deployment run 'training-pipeline/spam-training' \
     --param max_epoch=20 \
     --param accelerator='gpu' \
     --param devices=1 \
-    --param optimize_and_train=true
+    --param optimize_and_train=true \
+    --param n_trials=5
 ```
 
 run this for the full dataset
@@ -360,13 +361,15 @@ prefect deployment run 'training-pipeline/spam-training' \
     --param max_epoch=20 \
     --param accelerator='gpu' \
     --param devices=1 \
-    --param optimize_and_train=true
+    --param optimize_and_train=true \
+    --param n_trials=5
 ```
 
 it runs the exact same code as the command line version
 ```
 
-python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_column='v1' --name_of_message_column='v2' --mlflow_tracking_uri='http://127.0.0.1:5001' --max_epoch=20 --accelerator="gpu" --devices=1 --optimize_and_train
+python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_column='v1' --name_of_message_column='v2' --mlflow_tracking_uri='http://127.0.0.1:5001' --max_epoch=20 --accelerator="gpu" --devices=1 --optimize_and_train --n_trials=5
 ```
 
-That said, upon further testing, running the optimize and train setup via prefect yields lower scores than running it via CLI.
+That said, upon further testing, running the optimize and train setup via prefect yields lower scores than running optimize and train via CLI. I'm not sure why because they run the exact same code.
+
