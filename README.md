@@ -223,6 +223,17 @@ python deployment/gradio/interface.py --api-url=http://localhost:9696/predict
 ```
 
 ** Running in Prefect**
+0. If like me and you're running everything in WSL, have to increase the RAM available to WSL otherwise it will crash. My wslconfig looks like this
+```
+[wsl2]
+memory=8GB   # Limits VM memory in WSL
+processors=4 # Makes the WSL 4 VM use two virtual processors
+swap=4GB
+kernelCommandLine=systemd.unified_cgroup_hierarchy=1
+
+[experimental]
+autoMemoryReclaim=gradual
+```
 
 1. setup the postgresql db to be used by prefect. setup the connection string to be used
 ```
@@ -332,5 +343,7 @@ prefect deployment run 'training-pipeline/spam-training' \
     --param mlflow_tracking_uri='http://127.0.0.1:5001' \
     --param max_epoch=20 \
     --param accelerator='gpu' \
-    --param devices=1
+    --param devices=1 \
+    --param optimize_and_train=true
 ```
+

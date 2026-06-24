@@ -41,7 +41,7 @@ def tuning_pipeline(
 
         num_nodes: int = 1,
 
-        n_trials: int = 20
+        n_trials: int = 5
 ):
 
     args = Namespace(
