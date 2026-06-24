@@ -1,6 +1,7 @@
 # mlops-exer-1
 
 **Development**
+
 0. If like me and you're running everything in WSL, have to increase the RAM available to WSL otherwise it will crash. My wslconfig looks like this
 ```
 [wsl2]
@@ -237,7 +238,8 @@ for the local example, this would be
 python deployment/gradio/interface.py --api-url=http://localhost:9696/predict
 ```
 
-** Running in Prefect**
+**Running in Prefect**
+
 1. setup the postgresql db to be used by prefect. setup the connection string to be used
 ```
 postgresql+asyncpg://<username>:<password>@<host>:<port>/<database_name>
