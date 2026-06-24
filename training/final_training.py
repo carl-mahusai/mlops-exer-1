@@ -14,6 +14,8 @@ import training.metadata.tuning as tuning_metadata
 from spam_checker.data.spam_lit_datamodule import SMSDataModule
 from spam_checker.models.spam_classifier import SpamClassifier
 
+from core.monitoring import generate_evidently_report
+
 @rank_zero_only
 def log_artifacts_manual(mlflow_client, run_id, folder_path, trainer):
     data = trainer.datamodule
@@ -215,4 +217,11 @@ def train_model(args, dataframe):
     trainer.test(
         model,
         datamodule=dm
+    )
+
+    generate_evidently_report(
+        dm=dm,
+        model=model,
+        mlflow_logger=logger,
+        args=args
     )

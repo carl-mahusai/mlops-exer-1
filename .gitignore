@@ -18,4 +18,5 @@ __pycache__/
 *.pyo
 *.pyd
 
- mlops-exer-1-**/
+mlops-exer-1-**/
+reports/*
