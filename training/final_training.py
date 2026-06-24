@@ -99,14 +99,14 @@ def build_logger(args):
         tags={"processing": processing}
     )
 
-    mlflow_logger.log_hyperparams({
-        "batch_size": args.batch_size,
-        "embedding_dim": args.embedding_dim,
-        "hidden_dim": args.hidden_dim,
-        "lr": args.lr,
-        "max_vocab_size": args.max_vocab_size,
-        "max_length": args.max_length,
-    })
+    # mlflow_logger.log_hyperparams({
+    #     "batch_size": args.batch_size,
+    #     "embedding_dim": args.embedding_dim,
+    #     "hidden_dim": args.hidden_dim,
+    #     "lr": args.lr,
+    #     "max_vocab_size": args.max_vocab_size,
+    #     "max_length": args.max_length,
+    # })
 
     return mlflow_logger
 
