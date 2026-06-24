@@ -262,11 +262,11 @@ Note that you can use both. the default that will be used is the config but if y
 
 3. update also the privileges of the user for the db
 ```
-GRANT ALL PRIVILEGES ON DATABASE database_name TO username;
-GRANT USAGE, CREATE ON SCHEMA public TO username;
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO username;
-GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO username;
-ALTER DATABASE database_name OWNER TO username;
+GRANT ALL PRIVILEGES ON DATABASE <database_name> TO <username>;
+GRANT USAGE, CREATE ON SCHEMA public TO <username>;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO <username>;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO <username>;
+ALTER DATABASE <database_name> OWNER TO <username>;
 ```
 
 then run
@@ -281,7 +281,9 @@ prefect server start
 you only have to setup the db once. you can just run prefect server start in one window for future runs
 
 4. in another window, get the prefect api url and set it like this
+```
 prefect config set PREFECT_API_URL=http://127.0.0.1:4200/api
+```
 
 5. Run this to create your new process pool
 ```
@@ -297,7 +299,9 @@ prefect worker start --pool my-local-pool
 no need to recreate the pool for future runs.
 
 7. run this in a third window
+```
 prefect deploy
+```
 
 this will read the prefect.yaml file and setup the deployment
 select the deployment you want setup, it should look something like this
@@ -335,9 +339,10 @@ Would you like to configure schedules for this deployment? [y/n] (y): n
 since this is a local run and i can deploy anytime, select ```n```
 
 8. Run the following in your terminal for the worker
-
+```
 prefect config set PREFECT_API_REQUEST_TIMEOUT=300
 prefect config set PREFECT_WORKER_HEARTBEAT_SECONDS=60
+```
 
 9. once finished, in that same window, run the deployment. this example which uses ```spam_sample.csv``` uses a small sample for testing and would run the optimize section before training
 
