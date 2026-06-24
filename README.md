@@ -14,6 +14,8 @@ autoMemoryReclaim=gradual
 ```
 This is on 16GB on RAM
 
+Note also that i included sample datasets in the test_dataset folder. The ```spam.csv``` file is the full dataset from here https://www.kaggle.com/datasets/uciml/sms-spam-collection-dataset. ```spam_sample.csv``` is a smaller dataset for quick testing to make sure that things work if within memory limits
+
 1. Create your virtual environment. Note that this was made with Python 3.14.5
 
 2. Open your CLI and run
@@ -334,7 +336,7 @@ since this is a local run and i can deploy anytime, select ```n```
 prefect config set PREFECT_API_REQUEST_TIMEOUT=300
 prefect config set PREFECT_WORKER_HEARTBEAT_SECONDS=60
 
-9. once finished, in that same window, run the deployment. this example which uses ```spam_sample.csv``` uses a small sample for testing
+9. once finished, in that same window, run the deployment. this example which uses ```spam_sample.csv``` uses a small sample for testing and would run the optimize section before training
 
 ```
 prefect deployment run 'training-pipeline/spam-training' \
@@ -348,3 +350,15 @@ prefect deployment run 'training-pipeline/spam-training' \
     --param optimize_and_train=true
 ```
 
+run this for the full dataset
+```
+prefect deployment run 'training-pipeline/spam-training' \
+    --param data='/mnt/c/Users/user/Documents/Projects/mlops-exer-1/test_dataset/spam.csv' \
+    --param name_of_label_column='v1' \
+    --param name_of_message_column='v2' \
+    --param mlflow_tracking_uri='http://127.0.0.1:5001' \
+    --param max_epoch=20 \
+    --param accelerator='gpu' \
+    --param devices=1 \
+    --param optimize_and_train=true
+```
