@@ -63,9 +63,7 @@ class LogArtifactsCallback(Callback):
                     run_id=run_id,
                     folder_path=folder_path,
                     trainer=trainer
-                )
-
-                    
+                )   
 
 # Example 1: Stop when validation loss stops decreasing
 early_stop_loss = EarlyStopping(
@@ -82,140 +80,6 @@ early_stop_acc = EarlyStopping(
     mode="max"
 )
 
-# def train_model(
-#     args,
-#     df,
-#     best = tuning_metadata.BASE_PARAMETERS,
-#     tuned=False
-# ):
-#     multiprocessing.set_start_method("spawn", force=True)
-#     mlflow_logger = None
-
-#     callbacks = [early_stop_loss]
-
-#     if args.mlflow_tracking_uri:
-#         if (len(args.mlflow_tracking_uri)):
-#             # mlflow.pytorch.autolog()
-#             # mlflow.set_tracking_uri(args.mlflow_tracking_uri)
-
-#             # processing = "single"
-
-#             # if (args.distributed_processing):
-#             #     processing = "distributed"
-
-#             processing = "distributed"
-
-#             mlflow_logger = MLFlowLogger(
-#                 experiment_name="spam_training",
-#                 tracking_uri=args.mlflow_tracking_uri,  # Point to your local or remote server
-#                 # log_model='all',
-#                 log_model='False',
-#                 tags={"processing": processing}
-#             )
-#             callbacks.append(LogArtifactsCallback())
-
-#     # print(callbacks)
-
-#     # {'batch_size': 16, 'embedding_dim': 32, 'hidden_dim': 256, 'lr': 0.000585829304703927, 'max_vocab_size': 5000, 'max_length': 57}
-
-
-#     if (not df.empty):
-
-#         # print(df)
-
-#         # num_workers = args.num_workers
-
-#         num_workers = 0
-
-#         batch_size = args.batch_size
-#         max_length = args.max_length
-#         max_vocab_size = args.max_vocab_size
-#         embedding_dim = args.embedding_dim
-#         hidden_dim = args.hidden_dim
-#         hidden_dim = args.hidden_dim
-#         lr = args.lr
-
-#         if tuned:
-#             batch_size = best["batch_size"]
-#             max_length = best["max_length"]
-#             max_vocab_size = best["max_vocab_size"]
-#             embedding_dim = best["embedding_dim"]
-#             hidden_dim = best["hidden_dim"]
-#             lr = best["lr"]
-
-
-#         max_epochs = args.max_epochs
-#         accelerator = args.accelerator
-#         devices = args.devices
-#         # strategy_args = args.strategy
-#         strategy = "auto"
-#         num_nodes = args.num_nodes
-#         devices = args.devices
-
-#         data = SMSDataModule(
-#             dataframe=df,
-#             batch_size=batch_size,
-#             num_workers=num_workers,
-#             max_length=max_length,
-#             max_vocab_size=max_vocab_size
-#         )
-
-
-#         data.setup()
-
-#         print("<------------------------data load complete-------------------------------->")
-
-#         model = SpamClassifier(
-#             vocab_size=len(data.vocab),
-#             # **best
-#             embedding_dim=embedding_dim,
-#             hidden_dim=hidden_dim,
-#             lr=lr
-#         )
-
-#         print("<------------------------model load complete-------------------------------->")
-
-#         gpus = int(torch.cuda.is_available())
-
-#         # if (args.distributed_processing):
-
-#         #     print("calling distributed processing")
-#         #     strategy = "deepspeed"
-
-#         strategy = "deepspeed"
-
-#         trainer = Trainer(
-#             max_epochs=max_epochs,
-#             accelerator=accelerator,
-#             devices=devices, 
-#             logger=mlflow_logger,
-#             callbacks=callbacks,
-#             strategy=strategy,
-#             num_nodes=num_nodes,
-#             accumulate_grad_batches=4,
-#         )
-#         print("<------------------------trainer build complete-------------------------------->")
-
-#         trainer.fit(
-#             model,
-#             datamodule=data,
-#         )
-
-#         print("<------------------------trainer fit complete-------------------------------->")
-
-#         trainer.test(
-#             model,
-#             datamodule=data,
-#         )
-
-#         print("<------------------------trainer test complete-------------------------------->")
-
-#         has_log_callback = any(isinstance(item, LogArtifactsCallback) for item in callbacks)
-
-#         if (not has_log_callback):
-#             torch.save(data.vocab, "vocab.pt")
-#             trainer.save_checkpoint("sms_spam.ckpt")
-
 def build_logger(args):
 
     if not args.mlflow_tracking_uri:
@@ -228,12 +92,23 @@ def build_logger(args):
 
     processing = "distributed"
 
-    return MLFlowLogger(
+    mlflow_logger = MLFlowLogger(
         experiment_name="spam_training",
         tracking_uri=args.mlflow_tracking_uri,
         log_model=False,
-         tags={"processing": processing}
+        tags={"processing": processing}
     )
+
+    mlflow_logger.log_hyperparams({
+        "batch_size": args.batch_size,
+        "embedding_dim": args.embedding_dim,
+        "hidden_dim": args.hidden_dim,
+        "lr": args.lr,
+        "max_vocab_size": args.max_vocab_size,
+        "max_length": args.max_length,
+    })
+
+    return mlflow_logger
 
 def build_callbacks(logger):
 
