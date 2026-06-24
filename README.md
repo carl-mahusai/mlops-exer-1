@@ -213,7 +213,7 @@ docker run -it --rm -p 9696:9696 -e RUN_ID=<run id in mlflow> -e TRACKING_URI=<t
 
 for a local run, add ```--add-host=host.docker.internal:host-gateway``` and use "http://host.docker.internal:5001" for the tracking uri. this will connect to the mlflow setup running 
 ```
-docker run -it --rm -p 9696:9696 -e RUN_ID=a29d61564ccc4565adb883d02fb5ef9b -e TRACKING_URI="http://host.docker.internal:5001" --add-host=host.docker.internal:host-gateway spam-prediction-service-mlflow:v1
+docker run -it --rm -p 9696:9696 -e RUN_ID=be1d988ca7fe43e89f403c173b60a6c6 -e TRACKING_URI="http://host.docker.internal:5001" --add-host=host.docker.internal:host-gateway spam-prediction-service-mlflow:v1
 ```
 
 to test that the blackbox container running locally can connect to your mlflow setup that's also running locally, run the following in the container
@@ -378,3 +378,25 @@ it runs the exact same code as the command line version
 python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_column='v1' --name_of_message_column='v2' --mlflow_tracking_uri='http://127.0.0.1:5001' --max_epoch=20 --accelerator="gpu" --devices=1 --optimize_and_train --n_trials=5
 ```
 
+You can also run the deployment with existing hyperparameters
+```
+prefect deployment run 'training-pipeline/spam-training' \
+    --param data='/mnt/c/Users/user/Documents/Projects/mlops-exer-1/test_dataset/spam.csv' \
+    --param name_of_label_column='v1' \
+    --param name_of_message_column='v2' \
+    --param mlflow_tracking_uri='http://127.0.0.1:5001' \
+    --param max_epoch=20 \
+    --param accelerator='gpu' \
+    --param devices=1 \
+    --param batch_size=64 \
+    --param embedding_dim=64 \
+    --param hidden_dim=32 \
+    --param lr=0.004149415405973174 \
+    --param max_vocab_size=5000 \
+    --param max_length=53
+```
+
+which would be similar to this
+```
+python -m training.run_training --data='test_dataset/spam.csv' --name_of_label_column='v1' --name_of_message_column='v2' --mlflow_tracking_uri='http://127.0.0.1:5001' --max_epoch=20 --accelerator="gpu" --devices=1 --batch_size=64 --embedding_dim=64 --hidden_dim=32 --lr=0.004149415405973174 --max_vocab_size=5000 --max_length=53
+```

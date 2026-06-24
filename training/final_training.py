@@ -174,6 +174,21 @@ def train_model(args, dataframe):
 
     logger = build_logger(args)
 
+    if logger:
+        # Force creation of the MLflow run
+        _ = logger.experiment
+        run_id = logger.run_id
+
+        dataset = mlflow.data.from_pandas(
+            dataframe,
+            source=args.data,
+            name="sms_dataset"
+        )
+
+        # Reuse the Lightning logger's MLflow run
+        with mlflow.start_run(run_id=run_id):
+            mlflow.log_input(dataset, context="training")
+
     callbacks = build_callbacks(logger)
 
     dm = build_datamodule(
