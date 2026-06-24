@@ -2,6 +2,7 @@ import torch
 import os
 import multiprocessing
 import mlflow
+import json
 from lightning.pytorch.loggers import MLFlowLogger
 from lightning import Trainer
 from lightning.pytorch.callbacks import Callback, EarlyStopping
@@ -92,21 +93,24 @@ def build_logger(args):
 
     processing = "distributed"
 
+    initial_hyperparameters = json.dumps({
+        "batch_size": args.batch_size,
+        "embedding_dim": args.embedding_dim,
+        "hidden_dim": args.hidden_dim,
+        "lr": args.lr,
+        "max_vocab_size": args.max_vocab_size,
+        "max_length": args.max_length,
+    })
+
     mlflow_logger = MLFlowLogger(
         experiment_name="spam_training",
         tracking_uri=args.mlflow_tracking_uri,
         log_model=False,
-        tags={"processing": processing}
+        tags={
+            "processing": processing,
+            "initial_hyperparameters": initial_hyperparameters
+        }
     )
-
-    # mlflow_logger.log_hyperparams({
-    #     "batch_size": args.batch_size,
-    #     "embedding_dim": args.embedding_dim,
-    #     "hidden_dim": args.hidden_dim,
-    #     "lr": args.lr,
-    #     "max_vocab_size": args.max_vocab_size,
-    #     "max_length": args.max_length,
-    # })
 
     return mlflow_logger
 
