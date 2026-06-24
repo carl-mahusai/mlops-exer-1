@@ -136,7 +136,13 @@ if (len(RUN_ID) > 0 and len(TRACKING_URI) > 0):
 
                 print(new_dict)
                 try:
-                    model = SpamClassifier(**new_dict)
+                    # model = SpamClassifier(**new_dict)
+                    model = SpamClassifier(
+                        vocab_size=new_dict["vocab_size"],
+                        embedding_dim=new_dict["embedding_dim"],
+                        hidden_dim=new_dict["hidden_dim"],
+                        lr=new_dict["lr"],
+                    )
                     model.load_state_dict(state_dict)
                     model_built = True
                 except Exception as e:
