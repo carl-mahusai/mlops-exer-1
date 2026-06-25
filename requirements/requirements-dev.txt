@@ -11,3 +11,4 @@ gradio==6.19.0
 optuna==4.9.0
 optuna-integration==4.9.0
 prefect==3.7.5
+evidently==0.7.21
